@@ -1,0 +1,11 @@
+FROM node:22
+
+WORKDIR /app
+
+COPY frontend/package*.json ./
+RUN npm install
+
+COPY frontend/ ./
+
+# Default dev command
+CMD ["npm", "start"]
