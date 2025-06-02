@@ -18,13 +18,13 @@ function Navegador(props) {
           <li className="nav-item">
             <a className={`nav-link ${props.page == "Inicio" ? "active" : "" }`} aria-current="page" href="/Administración">Inicio</a>
           </li>
-            {Object.entries(props).filter(([key]) => !["ubicacion", "page"].includes(key)) // Excluye la propiedad "ubicacion"
+            {Object.entries(props).filter(([key]) => !["ubicacion", "page"].includes(key)) 
               .map(([key, value]) => (
                 
                 <li key={key} className="nav-item">
                     <Link 
                       className={`nav-link ${props.page === value ? "active" : ""}`}
-                      to={`/${props.ubicacion}/${value}`}  // Elimina duplicados
+                      to={`/${props.ubicacion}/${value}`}  
                     >
                       {value}
                     </Link>
@@ -35,6 +35,7 @@ function Navegador(props) {
             <a className="nav-link disabled" aria-disabled="true">{props.ubicacion}</a>
           </li>
         </ul>
+
       </div>
     </div>
   </nav>

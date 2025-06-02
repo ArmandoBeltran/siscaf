@@ -1,7 +1,11 @@
 
 import { useState } from 'react'
 import {Link} from 'react-router-dom'
-import '../assets/css/home.css';
+
+import adminImg from '../assets/img/botones/adminImg.png'
+import invImg from '../assets/img/botones/invImg.png'
+import ventasImg from '../assets/img/botones/ventasImg.png'
+
 import Header from '../components/Header';
 
 import BtnHome from '../components/botones/btnHome'
@@ -32,28 +36,33 @@ function Home() {
         
         <div className="container text-center my-4">
           <div className="row ">
-            <div className="col-12 my-5 col-md-4 p-5  ">
-              <Link to="/Administración">
-                <BtnHome 
-                  onClick={saludo} 
-                  text="Administración" 
-                />
+            <div className="container col-12 my-5 col-md-4 p-5 mx-sm-0 mx-lg-0">
+              <div className="row">
+                <Link to="/Administración" className="text-decoration-none">
+                  <BtnHome 
+                    onClick={saludo} 
+                    text ={"Administracion"}
+                    img= {adminImg}
+                  />
               </Link>
+              </div>
             </div>
             
-            <div className="col-12 my-5 col-md-4 p-5  ">
-              <Link to="/Inventarios">
+            <div className="col-12 my-5 col-md-4 p-5 " >
+              <Link to="/Inventarios" className="text-decoration-none ">
                 <BtnHome 
                   onClick={saludo} 
                   text="Inventarios" 
+                  img= {invImg}
                 />
               </Link>
             </div>
-            <div className="col-12 my-5 col-md-4 p-5  ">
-              <Link to="/Ventas">
+            <div className="col-12 my-5 col-md-4 p-5  " >
+              <Link to="/Ventas" className="text-decoration-none">
                 <BtnHome 
                   onClick={saludo} 
                   text="Ventas" 
+                  img= {ventasImg}
                 />
               </Link>
             </div>
