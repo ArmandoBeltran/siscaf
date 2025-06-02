@@ -1,5 +1,5 @@
 
-import Home from './pages/Home'
+import Home from './pages/home'
 import Admin from './pages/Admin'
 import Empleados from './pages/modulos/administracion/Empleados';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
