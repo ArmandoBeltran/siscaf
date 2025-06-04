@@ -38,7 +38,7 @@ function Home() {
           <div className="row ">
             <div className="container col-12 my-5 col-md-4 p-5 mx-sm-0 mx-lg-0">
               <div className="row">
-                <Link to="/Administración" className="text-decoration-none">
+                <Link to="/Administración" className="text-decoration-none" >
                   <BtnHome 
                     onClick={saludo} 
                     text ={"Administracion"}

@@ -13,7 +13,7 @@ function Navegador(props) {
         <span className="navbar-toggler-icon"></span>
       </button>
       <div className="collapse navbar-collapse" id="navbarNav">
-        <ul className="navbar-nav">
+        <ul className="container navbar-nav">
 
           <li className="nav-item">
             <a className={`nav-link ${props.page == "Inicio" ? "active" : "" }`} aria-current="page" href="/Administración">Inicio</a>
@@ -35,9 +35,22 @@ function Navegador(props) {
             <a className="nav-link disabled" aria-disabled="true">{props.ubicacion}</a>
           </li>
         </ul>
+        <div class="container-fluid d-flex justify-content-end ">
+            <div className="row">
+              <div className="col ">
+                <img src="" alt="Sesion" />
+              </div>
+              <div className="col">
+              <span id="Username" >Nombre de ususario</span>
+            </div>
+            </div>
+            
 
+        </div>
       </div>
+
     </div>
+        
   </nav>
   );
 } 

@@ -12,6 +12,8 @@ function Admin() {
             mod1 ={"Empleados"}
             mod2={"Departamentos"}
             mod3={"Ejemplo"}
+            mod4={"tpm"}
+
           />
     </section>
 
