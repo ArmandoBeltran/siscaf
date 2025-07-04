@@ -35,7 +35,7 @@ function Navegador(props) {
             <a className="nav-link disabled" aria-disabled="true">{props.ubicacion}</a>
           </li>
         </ul>
-        <div class="container-fluid d-flex justify-content-end ">
+        <div className="container-fluid d-flex justify-content-end ">
             <div className="row">
               <div className="col ">
                 <img src="" alt="Sesion" />
