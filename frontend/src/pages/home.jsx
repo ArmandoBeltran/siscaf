@@ -1,86 +1,47 @@
+import '../assets/css/home.css'
 
-import { useState } from 'react'
-import {Link} from 'react-router-dom'
+import InventoryImg from '../assets/img/botones/InventoryImg.png'
+import AdministrationImg from '../assets/img/botones/AdministrationImg.png'
+import Zapato from '../assets/img/Zapato.png'
 
-import adminImg from '../assets/img/botones/adminImg.png'
-import invImg from '../assets/img/botones/invImg.png'
-import ventasImg from '../assets/img/botones/ventasImg.png'
-
-import Header from '../components/Header';
-
-import BtnHome from '../components/botones/btnHome'
+import HomeButton from '../components/buttons/HomeButton';
 
 function Home() {
-  function saludo(){
-    console.log('Hola');
-  }
+  
   return (
     
     <div className="home">
-        <Header
-      />
-      <section className="Home-section " >
-        <div className="container text-center my-5">
-          <div className="m-0 row  " >
-            <div className="col-12 col-md-6  p-5">
-                <h2>Sistema Administrativo Andres</h2>
-                
-            </div>
-
-            <div className="col-12 col-md-6  ">
-                <img src="../logo_andres.png" alt="logo" />
-            </div>
+        <div className="home-main">
+          <div className="home-main-logo">
+            <img src={Zapato} alt="Icon" />
+            <h1>GRUPO ANDRÉS</h1>
+          </div>
+          <div className="home-main-titles">
+            <h1>Sistema Integral para el Control Administrativo y de Fabricación</h1>
           </div>
         </div>
-        
-        
-        <div className="container text-center my-4">
-          <div className="row ">
-            <div className="container col-12 my-5 col-md-4 p-5 mx-sm-0 mx-lg-0">
-              <div className="row">
-                <Link to="/Administración" className="text-decoration-none" >
-                  <BtnHome 
-                    onClick={saludo} 
-                    text ={"Administracion"}
-                    img= {adminImg}
-                  />
-              </Link>
-              </div>
-            </div>
-            
-            <div className="col-12 my-5 col-md-4 p-5 " >
-              <Link to="/Inventarios" className="text-decoration-none ">
-                <BtnHome 
-                  onClick={saludo} 
-                  text="Inventarios" 
-                  img= {invImg}
-                />
-              </Link>
-            </div>
-            <div className="col-12 my-5 col-md-4 p-5  " >
-              <Link to="/Ventas" className="text-decoration-none">
-                <BtnHome 
-                  onClick={saludo} 
-                  text="Ventas" 
-                  img= {ventasImg}
-                />
-              </Link>
-            </div>
-            {/*Plantilla */}
-            {/* 
-            <div className="col-12 ">
-              <BtnHome 
-                onClick={() => setView('otro')} 
-                text="Otro Botón" 
-              />
-            </div> 
-            */}
-          </div>
+        <div className="home-buttons">
+          <HomeButton 
+            route="/Inventarios"
+            img={InventoryImg}
+            alt="Módulo de Inventarios"
+            text="Inventarios"
+            description="Gestión de productos, materiales y existencias."/>
+          <HomeButton 
+            route="#"
+            img={AdministrationImg}
+            alt="Módulo de Administración"
+            text="Administración"
+            description="Organización de áreas, empleados y procesos internos."/>
+          <HomeButton 
+            route="#"
+            img={InventoryImg}
+            alt="Módulo de Ventas"
+            text="Ventas"
+            description="Registro y seguimiento de ventas y clientes."/>
         </div>
-
-              
-      </section>
     </div>
+
   );
 }
 
