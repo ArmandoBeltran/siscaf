@@ -1,25 +1,23 @@
-import logo from './logo.svg';
-import './App.css';
 
+import Home from './pages/home'
+import Admin from './pages/Admin'
+import Empleados from './pages/modulos/administracion/Empleados';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+
+//Archivo Raiz, colocar las paginas aqui con su ruta
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Me voy a suicidar
-        </a>
-      </header>
-    </div>
-  );
+    /*Agregamos todas las paginas con sus rutas */
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/Administración" element={<Admin />} />
+        {/*Empieza sistema Administración*/}
+        <Route path="/Administracion/Empleados" element={<Empleados/>} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App
