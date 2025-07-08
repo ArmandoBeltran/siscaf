@@ -37,3 +37,12 @@
     cursor: pointer;
     border: 1px solid #aa871d;
 }
+
+.toolbar-actions-searchbar, .toolbar-actions-searchbar:focus, .toolbar-actions-searchbar:active {
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: 1px solid #aa871d;
+    color: #343131;
+    width: 250px;
+}

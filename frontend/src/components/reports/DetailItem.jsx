@@ -1,7 +1,7 @@
-import '../../assets/css/detail-item.css'
+import React from 'react';
+import '../../assets/css/detail-item.css';
 
-function DetailItem({headers, data})
-{
+function DetailItem({ headers, data }) {
     return (
         <table className="table-detail">
             <thead>
@@ -16,14 +16,16 @@ function DetailItem({headers, data})
                     <tr key={idxRow}>
                         {headers.map((header, idxCol) => (
                             <td key={idxCol} className="px-2 py-1">
-                                {row[header] !== undefined ? row[header] : ''}
+                                {React.isValidElement(row[header])
+                                    ? row[header]
+                                    : row[header]}
                             </td>
                         ))}
                     </tr>
                 ))}
             </tbody>
         </table>
-    )
+    );
 }
 
-export default DetailItem
+export default DetailItem;

@@ -2,6 +2,8 @@ import '../src/assets/css/base.css'
 
 
 import Home from './pages/Home'
+
+import GeneralInventory from './pages/modulos/inventories/GeneralInventory';
 import BranchInventory from './pages/modulos/inventories/BranchInventory';
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -14,6 +16,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/Inventario" element={<GeneralInventory />}/>
         <Route path="/InventariosSucursal" element={<BranchInventory />} />
       </Routes>
     </BrowserRouter>

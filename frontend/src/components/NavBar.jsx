@@ -1,39 +1,70 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
-import '../assets/css/navbar.css'
+import '../assets/css/navbar.css';
+import Zapato from '../assets/img/Zapato.png';
 
-import Zapato from '../assets/img/Zapato.png'
-
-function NavBar({ modules })
-{
-    /*
-        TODO: Terminar de diseñar el navbar de forma que incluya el ícono del usuario 
-              del lado derecho y sea un desplegable con las acciones de usuario.
-    */
+function NavBar({ modules }) {
     return (
         <nav className="navbar navbar-section navbar-expand-md">
             <a href="/" className="navbar-brand navbar-logo">
-                <img src={Zapato} alt="Icon"/>
+                <img src={Zapato} alt="Icon" />
                 <p>GRUPO ANDRÉS</p>
             </a>
-            <div className="collapse navbar-collapse navbar-content" id='navbar-supported-content'>
+            <button
+                className="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span className="navbar-toggler-icon"></span>
+            </button>
+            <div className="collapse navbar-collapse navbar-content" id="navbarSupportedContent">
                 <ul className="navbar-nav mr-auto navbar-items">
-                    {modules.map((element, index) => (
-                        <li key={ index } className="nav-item">
-                            <Link to={ element.url } className="nav-link">{ element.text }</Link>
-                        </li>
-                    ))}
+                    {modules.map((module, index) =>
+                        module.submenus ? (
+                            <li key={index} className="nav-item dropdown">
+                                <span
+                                    className="nav-link dropdown-toggle"
+                                    id={`navbarDropdown${index}`}
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    {module.text}
+                                </span>
+                                <ul className="dropdown-menu" aria-labelledby={`navbarDropdown${index}`}>
+                                    {module.submenus.map((submenu, subIndex) => (
+                                        <li key={subIndex}>
+                                            <Link className="dropdown-item" to={submenu.url}>
+                                                {submenu.text}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </li>
+                        ) : (
+                            <li key={index} className="nav-item">
+                                <Link to={module.url} className="nav-link">
+                                    {module.text}
+                                </Link>
+                            </li>
+                        )
+                    )}
                 </ul>
-                
+
                 <div className="navbar-user dropdown">
-                    <FontAwesomeIcon icon={faUser} size="2x"/>
-                    
+                    <FontAwesomeIcon icon={faUser} size="2x" />
+                    {/* Aquí puedes agregar el dropdown del usuario si quieres */}
                 </div>
             </div>
         </nav>
-    )
+    );
 }
 
-export default NavBar
+export default NavBar;

@@ -1,22 +1,20 @@
 import { useEffect, useState } from "react";
 import { faBoxOpen, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import DetailItem from "../../../../components/reports/DetailItem";
+import DetailItem from "../../../components/reports/DetailItem";
 
-function BranchProducts({ branchId }) {
+function InventoryProducts({ filterProductName }) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isSlow, setIsSlow] = useState(false);
 
-    const headers = ["Producto", "Cantidad", "Última Fecha de Modificación"];
+    const headers = ["Producto", "Existencia", "Fecha de Alta", "Fecha de Modificación", "Acciones"];
 
     useEffect(() => {
-        if (!branchId) return;
-
         const slowTimeout = setTimeout(() => setIsSlow(true), 5000);
 
-        fetch(`http://localhost:5000/api/branch_inventory/get/branch/${branchId}`)
+        fetch(`http://localhost:5000/api/inventory/get`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Error ${res.status}: ${res.statusText}`);
@@ -27,8 +25,14 @@ function BranchProducts({ branchId }) {
                 if (result.success) {
                     const mappedData = result.data.map(item => ({
                         "Producto": item.nombre_producto,
-                        "Cantidad": item.existencia,
-                        "Última Fecha de Modificación": item.fecha_mod || item.fecha_alta
+                        "Existencia": item.existencia,
+                        "Fecha de Alta": item.fecha_alta,
+                        "Fecha de Modificación": item.fecha_mod || item.fecha_alta,
+                        "Acciones": (
+                            <button className="px-2 py-1 rounded">
+                                Asignar
+                            </button>
+                        )
                     }));
                     setData(mappedData);
                 } else {
@@ -46,7 +50,15 @@ function BranchProducts({ branchId }) {
             });
 
         return () => clearTimeout(slowTimeout);
-    }, [branchId]);
+    }, []);
+
+    const filteredProducts = data
+        .filter(product => product["Existencia"] > 0)
+        .filter(product =>
+            filterProductName
+                ? product["Producto"].toLowerCase().includes(filterProductName.toLowerCase())
+                : true
+        );
 
     if (loading) {
         return (
@@ -59,7 +71,7 @@ function BranchProducts({ branchId }) {
         );
     }
 
-    const noData = error || data.length === 0;
+    const noData = error || filteredProducts.length === 0;
 
     return (
         <div className="text-center">
@@ -67,14 +79,14 @@ function BranchProducts({ branchId }) {
                 <div className="flex flex-col items-center justify-center text-gray-500 py-6">
                     <FontAwesomeIcon icon={faBoxOpen} size="4x" />
                     <p className="mt-2 text-lg">
-                        {error ? "No se pudo obtener el inventario" : "No hay inventario en esta sucursal"}
+                        {error ? "No se pudo obtener el inventario" : "No hay productos que coincidan"}
                     </p>
                 </div>
             ) : (
-                <DetailItem headers={headers} data={data} />
+                <DetailItem headers={headers} data={filteredProducts} />
             )}
         </div>
     );
 }
 
-export default BranchProducts;
+export default InventoryProducts;
