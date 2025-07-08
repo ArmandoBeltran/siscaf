@@ -1,0 +1,39 @@
+.toolbar {
+    min-height: 50px;
+    width: 100%;
+    border-bottom: 2px solid #aa871d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toolbar-title {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.toolbar-title-btn {
+    border-radius: 10px;
+    width: 100px;
+    margin-bottom: 2px;
+}
+
+.toolbar-actions {
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+}
+
+.toolbar-actions-select {
+    width: 200px;
+    height: 25px;
+    border-radius: 10px;
+    background-color: #aa871d;
+    color: #EEF5FF;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid #aa871d;
+}

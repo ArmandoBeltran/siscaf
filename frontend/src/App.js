@@ -1,7 +1,9 @@
+import '../src/assets/css/base.css'
 
-import Home from './pages/home'
-import Admin from './pages/Admin'
-import Empleados from './pages/modulos/administracion/Empleados';
+
+import Home from './pages/Home'
+import BranchInventory from './pages/modulos/inventories/BranchInventory';
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
@@ -12,9 +14,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/Administración" element={<Admin />} />
-        {/*Empieza sistema Administración*/}
-        <Route path="/Administracion/Empleados" element={<Empleados/>} />
+        <Route path="/InventariosSucursal" element={<BranchInventory />} />
       </Routes>
     </BrowserRouter>
   )

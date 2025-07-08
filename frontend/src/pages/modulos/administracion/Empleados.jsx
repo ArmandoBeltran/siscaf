@@ -9,13 +9,14 @@ function Empleados() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/usuarios')
+    fetch('http://localhost:5000/api/employees/get')
       .then(res => {
         if (!res.ok) throw new Error('Error en la respuesta del servidor');
         return res.json();
       })
       .then(data => {
-        setDatos(data);
+        console.log(data);
+        setDatos(data.data);
         setLoading(false);
       })
       .catch(err => {

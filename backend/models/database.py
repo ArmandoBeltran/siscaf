@@ -1,0 +1,155 @@
+import psycopg2
+import os
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+class DataBase(): 
+
+    def __init__(self):
+        self._db_host     = os.getenv("DB_HOST", "localhost")
+        self._db_name     = os.getenv("DB_NAME", "andres_db")
+        self._db_user     = os.getenv("DB_USER", "postgresql")
+        self._db_password = os.getenv("DB_PASSWORD", "admin")
+
+    def _get_connection(self): 
+        conn = psycopg2.connect(
+            host = self._db_host, 
+            database = self._db_name,
+            user = self._db_user,
+            password = self._db_password,
+            port = 5432
+        )
+
+        return conn
+    
+    def _prepare_response(self, success, message, data, status):
+        return {
+            'success' : success,
+            'message' : message,
+            'data'    : data
+        }, status
+
+    def get_all(self, table): 
+        try:
+            conn   = self._get_connection()
+            cursor = conn.cursor()
+            query = f"SELECT * FROM {table}"
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+            columns = [desc[0] for desc in cursor.description]
+            data = [dict(zip(columns, row)) for row in result]
+
+            cursor.close()
+            conn.close()
+
+            response, status = self._prepare_response(True, "success", data, 200)
+            return response, status
+        except Exception as e: 
+            return self._prepare_response(False, "error", str(e), 400)
+
+    def get_by(self, field, value, table): 
+        try: 
+            conn   = self._get_connection()
+            cursor = conn.cursor()
+            query = f"SELECT * FROM {table} WHERE {field} = %s"
+            cursor.execute(query, (value,))
+            result = cursor.fetchall()
+
+            columns = [desc[0] for desc in cursor.description]
+            data = [dict(zip(columns, row)) for row in result]
+
+            cursor.close()
+            conn.close()
+
+            response = self._prepare_response(True, "success", data, 200)
+            return response
+        except Exception as e:
+            return self._prepare_response(False, "error", str(e), 400)
+        
+    def insert(self, table, data: dict):
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            columns = ', '.join(data.keys())
+            placeholders = ', '.join(['%s'] * len(data))
+            values = tuple(data.values())
+
+            query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders});"
+            logging.info(query)
+            cursor.execute(query, values)
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+
+            response = self._prepare_response(True, "success", "Record successfully created", 201)
+
+            return response
+        except Exception as e:
+            return self._prepare_response(False, "error", str(e), 400)
+
+    def update(self, table, data: dict, where_clause: dict):
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            set_expr = ', '.join([f"{k} = %s" for k in data])
+            where_expr = ' AND '.join([f"{k} = %s" for k in where_clause])
+
+            query = f"UPDATE {table} SET {set_expr} WHERE {where_expr};"
+            values = tuple(data.values()) + tuple(where_clause.values())
+
+            cursor.execute(query, values)
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            
+            response = self._prepare_response(True, "success", "Record successfully updated", 201)
+
+            return response
+        except Exception as e:
+            return self._prepare_response(False, "error", str(e), 400)
+
+    def delete(self, table, where_clause: dict):
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            where_expr = ' AND '.join([f"{k} = %s" for k in where_clause])
+            query = f"DELETE FROM {table} WHERE {where_expr};"
+            values = tuple(where_clause.values())
+
+            cursor.execute(query, values)
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+
+            response = self._prepare_response(True, "success", "Record successfully deleted", 200)
+
+            return response
+        except Exception as e:
+            return self._prepare_response(False, "error", str(e), 400)
+        
+    def execute_query(self, query, params=None):
+        """Generic method to execute safe parameterized queries."""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(query, params or ())
+                    if query.strip().upper().startswith("SELECT"):
+                        return cursor.fetchall()
+                    conn.commit()
+                    return None
+        except Exception as e:
+            logger.error(f"Query failed: {query} | Error: {str(e)}")
+            raise
+
+
+
+        
+    

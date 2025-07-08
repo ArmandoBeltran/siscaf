@@ -1,0 +1,18 @@
+.expandable-item {
+    background-color: #343131;
+    color: #aa871d;
+    width: 100%;
+}
+
+.expandable-item-content {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    align-items: center;
+    cursor: pointer;
+}
+
+.expandable-item-content-title {
+    display: flex;
+    align-items: center;
+}

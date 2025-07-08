@@ -1,0 +1,59 @@
+.home-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+}
+
+.home-button:hover .home-button-image {
+  background-color: #cdbf94;
+  transform: scale(1.1);
+  animation: levitate 2s ease-in-out infinite;
+}
+
+.home-button:hover .home-button-image h4,
+.home-button:hover .home-button-image p {
+  color: #343131;
+}
+
+.home-button-image h4 {
+  margin-top: 10px;
+  color: #cdbf94;
+  font-size: 25px;
+}
+
+.home-button-image p {
+  margin-top: 5px;
+  color: #cdbf94;
+  font-size: 15px;
+}
+
+
+.home-button-image {
+    width: 450px;
+    height: 250px; 
+    border: 2px solid #cdbf94;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+
+.home-button-image img {
+    width: 125px;
+    width: 125px;
+}
+
+@keyframes levitate {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
