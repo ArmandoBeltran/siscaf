@@ -1,4 +1,5 @@
 version: '3.8'
+
 services: 
   backend:
     build:
@@ -10,11 +11,11 @@ services:
       - ./backend:/app
     environment:
       - FLASK_ENV=development
-      - DB_HOST=db
-      - DB_NAME=postgres
+      - DB_HOST=host.docker.internal
+      - DB_NAME=andres_db
       - DB_USER=postgres
-      - DB_PASSWORD=postgres
-  
+      - DB_PASSWORD=admin
+
   frontend: 
     build: 
       context: .
@@ -29,15 +30,3 @@ services:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_INTERVAL=300
       - HOST=0.0.0.0
-
-
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    volumes: 
-      - pgdata:/var/lib/postgresql/data
-
-volumes: 
-  pgdata:

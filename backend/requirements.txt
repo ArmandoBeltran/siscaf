@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 flask
 flask_cors
+=======
+Flask
+psycopg2-binary
+>>>>>>> main
