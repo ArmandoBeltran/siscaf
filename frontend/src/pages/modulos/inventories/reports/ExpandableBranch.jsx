@@ -1,38 +1,24 @@
 import ExpandableItem from "../../../../components/reports/ExpandableItem";
-
 import BranchProducts from "./BranchProducts";
-
-import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 
-function ExpandableBranch()
-{
-    const [branches, setBranches] = useState([]);
+function ExpandableBranch({ branches, filterBranchId }) {
 
-    useEffect(() => {
-        fetch("http://localhost:5000/api/branches/get_with_totals")
-        .then(res => {
-            if (!res.ok) throw new Error("Error en la respuesta del servidor");
-            return res.json();
-        })
-        .then(data => {
-            console.log(data);
-            setBranches(data.data || [])
-        })
-        .catch(err => console.error(err.message));
-    }, []);
+    const filteredBranches = filterBranchId
+        ? branches.filter(branch => branch.id_sucursal.toString() === filterBranchId)
+        : branches;
 
     return (
         <>
-            {branches.length > 0 ? (
-                branches.map(branch => (
+            {filteredBranches.length > 0 ? (
+                filteredBranches.map(branch => (
                     <ExpandableItem
                         key={branch.id_sucursal}
                         title={branch.nombre}
                         line_content={<h3>Total productos: {branch.cantidad_total}</h3>}
                     >
-                        <BranchProducts branchId={branch.id_sucursal}/>
+                        <BranchProducts branchId={branch.id_sucursal} />
                     </ExpandableItem>
                 ))
             ) : (
@@ -52,4 +38,4 @@ function ExpandableBranch()
     );
 }
 
-export default ExpandableBranch
+export default ExpandableBranch;

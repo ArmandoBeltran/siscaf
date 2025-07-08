@@ -1,20 +1,13 @@
-import '../assets/css/toolbar.css'
+import '../assets/css/toolbar.css';
 
-function ToolBar({ toolbar_title })
-{
+function ToolBar({ toolbar_title, children }) {
     return (
         <div className="toolbar">
             <div className="toolbar-title">
-                <h4>{ toolbar_title }</h4>
-                {/*<button className='toolbar-title-btn'>Crear</button>*/}
+                <h4>{toolbar_title}</h4>
             </div>
             <div className="toolbar-actions">
-                <select name="toolbar_branches" className='toolbar-actions-select' id="toolbar-actions-select">
-                    <option selected>Filtrar por sucursal</option>
-                    <option value="">1</option>
-                    <option value="">1</option>
-                    <option value="">1</option>
-                </select>
+                {children}
             </div>
         </div>
     );

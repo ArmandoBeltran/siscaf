@@ -1,4 +1,10 @@
 from .database import DataBase
+from .product  import Product
+
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class Inventory():
 
@@ -22,8 +28,8 @@ class Inventory():
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self):
-        return {
+    def to_dict(self, include_all=None):
+        data = {
             "id_inventario": self.id_inventario,
             "id_producto": self.id_producto,
             "cantidad_producida": self.cantidad_producida,
@@ -32,34 +38,65 @@ class Inventory():
             "fecha_alta": self.fecha_alta,
             "fecha_mod": self.fecha_mod,
         }
+        return data if include_all else {k: v for k, v in data.items() if v is not None}
 
     def save(self):
-        if self.id_empleado if hasattr(self, 'id_empleado') else None:
-            return self._database.update(self._table, self.to_dict(), {"id_empleado": self.id_empleado})
-        else:
-            return self._database.insert(self._table, self.to_dict())
+        return self._database.insert(self._table, self.to_dict())
+    
+    def update(self, new_data):
+        return self._database.update(self._table, new_data, {"id_inventario": self.id_inventario})
 
     def delete(self):
-        if hasattr(self, 'id_empleado') and self.id_empleado:
-            return self._database.delete(self._table, {"id_empleado": self.id_empleado})
-        return "Cannot delete: id_empleado is not set."
+            return self._database.delete(self._table, {"id_inventario": self.id_inventario})
 
-    def load(self, record_id):
-        result = self._database.get_by(self._table, list(self.to_dict().keys())[0], record_id)
-        if result:
-            columns = list(self.to_dict().keys())
-            self._from_dict(dict(zip(columns, result[0])))
-            return self
-        return None
-    
-    def get_all(self):
-        results = self._database.get_all(self._table)
-        data = []
+    def load(self, record_id, get_data=False):
+        response, status = self._database.get_by("id_inventario", record_id, self._table)
+        results = response.get("data")
+
         if results:
-            columns = list(self.to_dict().keys())
-            for row in results:
+            self._from_dict(results[0])
+            if get_data:
+                data = []
+                for item in results:
+                    instance = self.__class__()
+                    instance._from_dict(item)
+                    product_response, _ = Product().load(record_id=item.get("id_producto"), get_data=True)
+                    product_name = None
+                    if product_response.get("success"):
+                        product_data = product_response.get("data")
+                        if isinstance(product_data, dict):
+                            product_name = product_data.get("nombre")
+
+                    item_dict = instance.to_dict()
+                    if product_name:
+                        item_dict["nombre_producto"] = product_name
+                    data.append(item_dict)
+
+                response["data"] = data
+                return response, status
+            return self
+        return response, status
+
+    def get_all(self):
+        response, status = self._database.get_all(self._table)
+        results = response.get("data")
+        data = []
+
+        if results:
+            for item in results:
                 instance = self.__class__()
-                instance._from_dict(dict(zip(columns, row)))
-                data.append(instance.to_dict())
-        
-        return data
+                instance._from_dict(item)
+                product_response, _ = Product().load(record_id=item.get("id_producto"), get_data=True)
+                product_name = None
+                if product_response.get("success"):
+                    product_data = product_response.get("data")
+                    if isinstance(product_data, dict):
+                        product_name = product_data.get("nombre")
+
+                item_dict = instance.to_dict()
+                if product_name:
+                    item_dict["nombre_producto"] = product_name
+                data.append(item_dict)
+
+        response["data"] = data
+        return response, status

@@ -6,7 +6,7 @@ from routes.sale import sale_bp
 from routes.sale_details import sale_details_bp
 from routes.salesperson import salesperson_bp
 from routes.branch import branch_bp
-'''from routes.inventory import inventory_bp'''
+from routes.inventory import inventory_bp
 from routes.branch_inventory import branch_inventory_bp
 from routes.employee import employee_bp
 '''from routes.user import user_bp
@@ -21,7 +21,7 @@ app.register_blueprint(sale_bp, url_prefix='/api/sales')
 app.register_blueprint(sale_details_bp, url_prefix='/api/sale_details')
 app.register_blueprint(salesperson_bp, url_prefix='/api/salesperson')
 app.register_blueprint(branch_bp, url_prefix='/api/branches')
-'''app.register_blueprint(inventory_bp, url_prefix='/api/inventory')'''
+app.register_blueprint(inventory_bp, url_prefix='/api/inventory')
 app.register_blueprint(branch_inventory_bp, url_prefix='/api/branch_inventory')
 app.register_blueprint(employee_bp, url_prefix='/api/employees')
 '''app.register_blueprint(user_bp, url_prefix='/api/users')

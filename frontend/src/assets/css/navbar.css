@@ -54,16 +54,33 @@
     align-items: normal;
 }
 
-.nav-link {
-    text-align: center;
-    height: 100%;  
-    color: #cdbf94;
-    cursor: pointer;  
+.navbar .nav-link,
+.navbar .nav-link:visited,
+.navbar .nav-link:focus,
+.navbar .nav-link:active {
+    color: #cdbf94 !important;
+    background-color: transparent !important;
+    text-decoration: none !important;
+    outline: none;
 }
 
-.nav-link:hover {
-    background-color: #cdbf94;
-    color: #343131;
+.navbar .nav-link:hover {
+    color: #343131 !important;
+    background-color: #cdbf94 !important;
+}
+
+.navbar .dropdown-menu .dropdown-item,
+.navbar .dropdown-menu .dropdown-item:visited,
+.navbar .dropdown-menu .dropdown-item:focus,
+.navbar .dropdown-menu .dropdown-item:active {
+    color: #343131 !important;
+    background-color: transparent !important;
+    text-decoration: none !important;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover {
+    color: #343131 !important;
+    background-color: #cdbf94 !important;
 }
 
 .navbar-user-content {
