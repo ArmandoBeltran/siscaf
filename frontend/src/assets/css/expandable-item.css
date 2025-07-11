@@ -7,12 +7,39 @@
 .expandable-item-content {
     display: flex;
     justify-content: space-between;
-    padding: 5px;
     align-items: center;
+    padding: 10px 15px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.expandable-item-content:hover {
+    background-color: #4a4747;
 }
 
 .expandable-item-content-title {
     display: flex;
     align-items: center;
+    font-size: 1.1rem;
+}
+
+.expandable-item-content-title h3 {
+    margin: 0 0 0 8px;
+    font-weight: 600;
+}
+
+.expandable-item-content-data {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    white-space: nowrap;
+    font-size: 1rem;
+}
+
+.pl-4 {
+    padding-left: 1rem;
+}
+
+.mt-2 {
+    margin-top: 0.5rem;
 }

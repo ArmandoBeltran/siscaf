@@ -1,7 +1,12 @@
 from flask import Blueprint, request, jsonify
 from models.sale_details import SaleDetails
 
+import logging
+
 sale_details_bp = Blueprint('sale_details', __name__)
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 def validate_sale_details(data):
     required = []
@@ -15,20 +20,28 @@ def validate_sale_details(data):
 def get_all():
     try:
         model = SaleDetails()
-        return jsonify(model.get_all()), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        response, status = model.get_all()
 
-@sale_details_bp.route('/get/<int:id_detalle>', methods=['GET'])
-def get_by_id(id_detalle):
+        return response, status
+    except Exception as e:
+        return jsonify({"message": str(e), 'success': False}), 500
+
+@sale_details_bp.route('/get_by', methods=['GET'])
+def get_by():
     try:
+        field = request.args.get('field')
+        value = request.args.get('value')
+
+        if not field or value is None:
+            return jsonify({"message": "Missing 'field' or 'value' parameter", 'success': False}), 400
+        
         model = SaleDetails()
-        result = model.load(id_detalle)
-        return jsonify(model.to_dict()) if result else (jsonify({"error": "Detalle de venta no encontrado"}), 404)
+        result, status = model.load(field, value, get_data=True)
+        return result, status
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@sale_details_bp.route('/add', methods=['POST'])
+@sale_details_bp.route('/create', methods=['POST'])
 def create():
     try:
         data = request.get_json()
@@ -36,34 +49,36 @@ def create():
         if errors:
             return jsonify({"errors": errors}), 400
         model = SaleDetails(data)
-        result = model.save()
-        return jsonify({"message": "Detalle de venta creado", "result": result}), 201
+        result, status = model.save()
+        return result, status
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e), 'success': False}), 500
 
 @sale_details_bp.route('/update/<int:id_detalle>', methods=['PUT'])
 def update(id_detalle):
     try:
         data = request.get_json()
-        errors = validate_sale_details(data)
-        if errors:
-            return jsonify({"errors": errors}), 400
+
         model = SaleDetails()
-        if not model.load(id_detalle):
-            return jsonify({"error": "Detalle de venta no encontrado"}), 404
-        model._from_dict(data)
-        result = model.save()
-        return jsonify({"message": "Detalle de venta actualizado", "result": result}), 200
+        sale_detail = model.load(id_detalle)
+        if not sale_detail:
+            return jsonify({"message": "Detalle de venta no encontrado"}), 404
+        
+        result, status = model.update(data)
+        return result, status
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e), 'success': False}), 500
 
 @sale_details_bp.route('/delete/<int:id_detalle>', methods=['DELETE'])
 def delete(id_detalle):
     try:
         model = SaleDetails()
-        if not model.load(id_detalle):
-            return jsonify({"error": "Detalle de venta no encontrado"}), 404
-        result = model.delete()
-        return jsonify({"message": "Detalle de venta eliminado", "result": result}), 200
+        sale_detail = model.load(id_detalle)
+
+        if not sale_detail:
+            return jsonify({"message": "Detalle de venta no encontrado", "success": False}), 404
+        
+        result, status = model.delete()
+        return result, status
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"message": str(e), 'success': False}), 500

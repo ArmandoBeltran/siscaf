@@ -1,6 +1,9 @@
 from .database import DataBase
 from datetime import date
+import logging
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class Category(): 
 
@@ -25,8 +28,9 @@ class Category():
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self, include_id=False, operation=None):
+    def to_dict(self, include_all=None):
         data = {
+            "id_categoria" : self.id_categoria,
             "nombre": self.nombre,
             "descripcion": self.descripcion,
             "genero": self.genero,
@@ -35,45 +39,79 @@ class Category():
             "fecha_alta": self.fecha_alta,
             "fecha_mod": self.fecha_mod,
         }
-        
-        if operation == "insert": 
-            data["fecha_alta"] = date.today()
-            data["fecha_mod"]  = date.today()
-        elif operation == "update": 
-            data["fecha_mod"] = date.today()
 
-        if include_id: 
-            data["id_categoria"] = self.id_categoria
-
-        return data
+        return data if include_all else {k: v for k, v in data.items() if v is not None}
 
     def save(self):
-        if self.id_categoria:
-            return self._database.update(self._table, self.to_dict(operation="update"), {"id_categoria": self.id_categoria})
-        else:
-            return self._database.insert(self._table, self.to_dict(operation="insert"))
+        return self._database.insert(self._table, self.to_dict())
+        
+    def update(self, new_data): 
+        return self._database.update(self._table, new_data, {"id_categoria": self.id_categoria})
 
     def delete(self):
         if hasattr(self, 'id_categoria') and self.id_categoria:
             return self._database.delete(self._table, {"id_categoria": self.id_categoria})
         return "Cannot delete: id_categoria is not set."
 
-    def load(self, record_id):
-        result = self._database.get_by("id_categoria", record_id, self._table)
-        if result:
-            columns = list(self.to_dict(True).keys())
-            self._from_dict(dict(zip(columns, result[0])))
+    def load(self, field, value, get_data=False):
+        response, status = self._database.get_by(field, value, self._table)
+        results = response.get("data", [])
+
+        if results: 
+            self._from_dict(results[0])
+            if get_data:
+                response["data"] = self.to_dict()
+                return response, status
             return self
-        return None
+        return response, status
     
     def get_all(self):
-        results = self._database.get_all(self._table)
+        response, status = self._database.get_all(self._table)
+        results = response.get("data")
         data = []
+
         if results:
-            columns = list(self.to_dict(include_id=True).keys())
             for row in results:
                 instance = self.__class__()
-                instance._from_dict(dict(zip(columns, row)))
+                instance._from_dict(row)
                 data.append(instance.to_dict())
-        
-        return data
+
+        response["data"] = data
+        return response, status
+    
+    def report(self): 
+        query = '''
+            SELECT categoria.id_categoria, categoria.nombre, categoria.temporada, 
+                   COALESCE(COUNT(producto.id_producto), 0) AS cantidad,
+                    CASE 
+                        WHEN categoria.estatus = true THEN 'Activa'
+                    ELSE
+                        'Inactiva'
+                    END AS estado
+            FROM catalogos.categoria AS categoria
+            LEFT JOIN catalogos.producto AS producto ON producto.id_categoria = categoria.id_categoria
+            GROUP BY categoria.id_categoria, categoria.nombre, categoria.temporada, categoria.estatus
+            ORDER BY categoria.nombre;
+        '''
+        try:
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query)
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            logging.info(results)
+            columns = ["id_categoria", "nombre", "temporada", "cantidad", "estado"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            return {
+                "success": True,
+                "message": "Categorias con total de productos obtenidas",
+                "data": data
+            }, 200
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500

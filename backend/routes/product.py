@@ -25,11 +25,17 @@ def get_all():
     except Exception as e:
         return jsonify({"message": str(e), 'success': False}), 500
     
-@product_bp.route('/get/<int:id_producto>', methods=['GET'])
-def get_by_id(id_producto):
+@product_bp.route('/get_by', methods=['GET'])
+def get_by():
     try:
+        field = request.args.get('field')
+        value = request.args.get('value')
+
+        if not field or value is None:
+            return jsonify({"message": "Missing 'field' or 'value' parameter", 'success': False}), 400
+
         model = Product()
-        result, status = model.load(id_producto, get_data=True)
+        result, status = model.load(field, value, get_data=True)
 
         return result, status
     except Exception as e:
