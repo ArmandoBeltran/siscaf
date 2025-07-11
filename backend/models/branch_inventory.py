@@ -62,7 +62,7 @@ class BranchInventory():
                 for item in results:
                     instance = self.__class__()
                     instance._from_dict(item)
-                    product_response, _ = Product().load(record_id=item.get("id_producto"), get_data=True)
+                    product_response, _ = Product().load("id_producto", item.get("id_producto"), get_data=True)
                     product_name = None
                     if product_response.get("success"):
                         product_data = product_response.get("data")

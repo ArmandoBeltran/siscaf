@@ -5,6 +5,11 @@ import Home from './pages/Home'
 
 import GeneralInventory from './pages/modulos/inventories/GeneralInventory';
 import BranchInventory from './pages/modulos/inventories/BranchInventory';
+import CategoriesReport from './pages/modulos/inventories/CategoriesReport';
+
+import DepartmentsReport from './pages/modulos/administration/reports/DepartmentsReport';
+
+import SalesReport from './pages/modulos/sales/reports/SalesReport';
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -17,7 +22,15 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/Inventario" element={<GeneralInventory />}/>
-        <Route path="/InventariosSucursal" element={<BranchInventory />} />
+        <Route path="/InventarioSucursal" element={<BranchInventory />} />
+        <Route path="/ReporteProductosCategoria" element={<CategoriesReport />} />
+
+        {/** Administración */}
+        <Route path="/ReporteDepartamentosEmpleados" element={<DepartmentsReport />} />
+
+        {/** Ventas */}
+        <Route path="/ReporteVentas" element={<SalesReport />} />
+
       </Routes>
     </BrowserRouter>
   )
