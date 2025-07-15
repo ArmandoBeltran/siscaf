@@ -28,6 +28,42 @@ def get_by_id(id_detalle):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@sale_details_bp.route('/get/saleByGender/<start_date>/<end_date>',methods=['GET'])
+def get_sale_Gender(start_date, end_date):
+    try:
+        model = SaleDetails()
+        result = model.get_saleByGender(start_date , end_date)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500  
+    
+@sale_details_bp.route('/get/saleByCategory/<start_date>/<end_date>',methods=['GET'])
+def get_sale_Category(start_date, end_date):
+    try:
+        model = SaleDetails()
+        result = model.get_categorySales(start_date , end_date)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500  
+    
+@sale_details_bp.route('/get/productSales/<start_date>/<end_date>/<int:id_producto>',methods=['GET'])
+def get_sale_ProductSales(start_date, end_date , id_producto ):
+    try:
+        model = SaleDetails()
+        result = model.get_productSales(start_date , end_date , id_producto)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500  
+    
+@sale_details_bp.route('/get/saleBySucursal/<start_date>/<end_date>',methods=['GET'])
+def get_sale_Sucursal(start_date, end_date):
+    try:
+        model = SaleDetails()
+        result = model.get_sucursalSales(start_date , end_date)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500  
+
 @sale_details_bp.route('/add', methods=['POST'])
 def create():
     try:

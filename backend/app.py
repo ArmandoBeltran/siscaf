@@ -24,6 +24,7 @@ app.register_blueprint(branch_bp, url_prefix='/api/branches')
 app.register_blueprint(inventory_bp, url_prefix='/api/inventory')
 app.register_blueprint(branch_inventory_bp, url_prefix='/api/branch_inventory')
 app.register_blueprint(employee_bp, url_prefix='/api/employees')
+
 '''app.register_blueprint(user_bp, url_prefix='/api/users')
 app.register_blueprint(department_bp, url_prefix='/api/departments')'''
 

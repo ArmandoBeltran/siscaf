@@ -46,6 +46,26 @@ class Sale():
             return self
         return None
     
+    def getSales(self):
+        result = self._database.execute_query('''
+            SELECT a.id_venta , b2.nombre , c.nombre , fecha_venta 
+            FROM catalogos.ventas a 
+            JOIN catalogos.vendedores b1 ON (a.id_vendedor = b1.id_vendedor)
+            JOIN empleados.empleados b2 ON (b1.id_empleado = b2.id_empleado)
+            JOIN catalogos.sucursal c ON (a.id_sucursal = c.id_sucursal)
+            WHERE a.fecha_venta BETWEEN '2025-01-01' AND '2025-12-31' ''')
+        data=[]
+        if result:
+            for row in result:
+                data.append({
+                    'id_venta': row[0],
+                    'nombre': row[1],
+                    'sucursal': row[2],
+                    'fecha_venta': row[3]
+                })
+            return data
+        return None
+    
     def get_all(self):
         results = self._database.get_all(self._table)
         data = []

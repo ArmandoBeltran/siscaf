@@ -60,6 +60,7 @@ class Product():
     def delete(self):
         return self._database.delete(self._table, {"id_producto": self.id_producto})
 
+    
     def load(self, record_id, get_data=False):
         response, status = self._database.get_by("id_producto", record_id, self._table)
         results = response.get("data")
