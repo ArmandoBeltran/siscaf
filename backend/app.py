@@ -9,8 +9,8 @@ from routes.branch import branch_bp
 from routes.inventory import inventory_bp
 from routes.branch_inventory import branch_inventory_bp
 from routes.employee import employee_bp
-'''from routes.user import user_bp
-from routes.department import department_bp'''
+'''from routes.user import user_bp'''
+from routes.department import department_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -24,9 +24,8 @@ app.register_blueprint(branch_bp, url_prefix='/api/branches')
 app.register_blueprint(inventory_bp, url_prefix='/api/inventory')
 app.register_blueprint(branch_inventory_bp, url_prefix='/api/branch_inventory')
 app.register_blueprint(employee_bp, url_prefix='/api/employees')
-
-'''app.register_blueprint(user_bp, url_prefix='/api/users')
-app.register_blueprint(department_bp, url_prefix='/api/departments')'''
+'''app.register_blueprint(user_bp, url_prefix='/api/users')'''
+app.register_blueprint(department_bp, url_prefix='/api/departments')
 
 if __name__ == '__main__': 
     app.run(host='0.0.0.0', debug=True)
