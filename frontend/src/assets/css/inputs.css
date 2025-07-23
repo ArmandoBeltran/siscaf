@@ -1,0 +1,8 @@
+.dateInput, .dateInput:focus, .dateInput:active {
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom: 1px solid #aa871d;
+    color: #343131;
+    width: 130px;
+}

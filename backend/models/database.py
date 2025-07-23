@@ -10,7 +10,7 @@ class DataBase():
         self._db_host     = os.getenv("DB_HOST", "localhost")
         self._db_name     = os.getenv("DB_NAME", "andres_db")
         self._db_user     = os.getenv("DB_USER", "postgresql")
-        self._db_password = os.getenv("DB_PASSWORD", "admin")
+        self._db_password = os.getenv("DB_PASSWORD", "admin123")
 
     def _get_connection(self): 
         conn = psycopg2.connect(

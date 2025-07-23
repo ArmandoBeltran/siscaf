@@ -34,7 +34,7 @@ function Home() {
             text="Administración"
             description="Organización de áreas, empleados y procesos internos."/>
           <HomeButton 
-            route="#"
+            route="/Ventas"
             img={InventoryImg}
             alt="Módulo de Ventas"
             text="Ventas"

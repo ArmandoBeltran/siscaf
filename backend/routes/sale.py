@@ -40,6 +40,16 @@ def get_by():
         return result, status
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@sale_bp.route('/get/generalSales', methods=['GET'])
+def get_sales():#Reporte de ventas General
+    try: 
+        model = Sale()
+        result = model.getSales()
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @sale_bp.route('/create', methods=['POST'])
 def create():
