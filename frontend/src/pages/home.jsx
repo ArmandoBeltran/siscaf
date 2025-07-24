@@ -5,7 +5,6 @@ import AdministrationImg from '../assets/img/botones/AdministrationImg.png'
 import Zapato from '../assets/img/Zapato.png'
 
 import HomeButton from '../components/buttons/HomeButton';
-import DropdownUser from '../components/dropdownUser';
 
 function Home() {
   
@@ -19,9 +18,6 @@ function Home() {
           </div>
           <div className="home-main-titles">
             <h1>Sistema Integral para el Control Administrativo y de Fabricación</h1>
-          </div>
-         <div className="home-main-user">
-            <DropdownUser/>
           </div>
         </div>
         <div className="home-buttons">

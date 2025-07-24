@@ -6,19 +6,3 @@
     color: #343131;
     width: 130px;
 }
-.textInputLogin {
-    border-top: none;
-    border-right: none;
-    border-left: none;
-    border-bottom: 1px solid #aa871d;
-    background: #1c1b1b;
-    color: #aa871d;
-    padding: 10px;
-    width: 100%;
-}
-
-.textInputLogin:focus, 
-.textInputLogin:active {
-    border-bottom: 2px solid #aa871d;
-    outline: none;
-}

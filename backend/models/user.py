@@ -1,10 +1,4 @@
 from .database import DataBase
-import uuid
-import json
-
-from datetime import datetime, timedelta
-
-
 
 class User(): 
 
@@ -71,69 +65,3 @@ class User():
                 data.append(instance.to_dict())
         
         return data
-    
-    def create_session(self, user_id, extra_data=None):
-        session_id = str(uuid.uuid4())
-        expires_at = datetime.now() + timedelta(days=1)
-
-        # Si no te pasan datos extra, crea un JSON vacío
-        data_json = json.dumps(extra_data or {})
-
-        self._database.execute_query(
-            '''INSERT INTO empleados.sesiones (session_id, user_id, data, expires_at) 
-            VALUES (%s, %s, %s, %s)''',
-            (session_id, user_id, data_json, expires_at)
-        )
-        return session_id
-    
-
-    def validate_session(self, session_id): 
-        result=self._database.execute_query(''' SELECT user_id FROM sessions WHERE session_id = %s AND expires_at > NOW() ''' ,(session_id))
-        return result[0] if result else None
-
-    def loginUser(self, email, clave):
-        result = self._database.execute_query(
-            '''SELECT id_usu, id_empleado, nombre_usu, id_departamento, correo 
-            FROM empleados.usuarios 
-            WHERE correo = %s AND clave = %s AND estatus = 'true' ''',
-            (email, clave)
-        )
-        if result:
-            columns = ["id_usu", "id_empleado", "nombre_usu", "id_departamento", "correo"]
-            data = [dict(zip(columns, row)) for row in result]
-            
-            user_data = data[0]
-            session_id = self.create_session(user_data['id_usu'] , user_data)
-        
-            
-            return user_data , session_id
-        
-        return None
-    
-    def delete_Session(self, session_id):
-        return self._database.delete("empleados.sesiones", {"session_id": session_id})
-
-    
-    def get_session(self, session_id):
-        result = self._database.execute_query('''
-            SELECT session_id, user_id, expires_at
-            FROM empleados.sesiones
-            WHERE session_id = %s
-        ''', (session_id,))
-        
-        if result:
-            columns = ["session_id", "user_id", "expires_at"]
-            return dict(zip(columns, result[0]))
-        return None
-
-    def get_user_by_id(self, user_id):
-        result = self._database.execute_query('''
-            SELECT id_usu, id_empleado, nombre_usu, id_departamento, correo
-            FROM empleados.usuarios
-            WHERE id_usu = %s
-        ''', (user_id,))
-        
-        if result:
-            columns = ["id_usu", "id_empleado", "nombre_usu", "id_departamento", "correo"]
-            return dict(zip(columns, result[0]))
-        return None

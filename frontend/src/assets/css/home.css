@@ -27,20 +27,6 @@
   align-items: center;
 }
 
-.home-main-user {
-  position: fixed;
-  top: 20px;
-  right: 20px; 
-  display: flex;
-  flex-direction: column; 
-  justify-content: center;
-  align-items: flex-end;
-  gap: 10px;
-  z-index: 10;
-  color: #aa871d;
-  font-size: 25px;
-}
-
 .home-main-titles h1 {
   font-size: 60px;
   color: #cdbf94;
