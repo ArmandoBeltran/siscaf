@@ -19,7 +19,7 @@ import Pagina404 from './pages/page404';
 function App() {
   return (
     /*Agregamos todas las paginas con sus rutas */
-    <UserProvider>{/*Estos componentes estan en desarrollo (Session)*/}
+    <UserProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LoginPage />} />
