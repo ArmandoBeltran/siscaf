@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
 import { faBoxOpen, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import DetailItem from "../../../components/reports/DetailItem";
+import DetailItem from "../../../../components/reports/DetailItem";
 
-function InventoryProducts({ filterProductName }) {
+function DepartmentEmployees({ departmentId }) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isSlow, setIsSlow] = useState(false);
 
-    const headers = ["Producto", "Existencia", "Fecha de Alta", "Fecha de Modificación", "Acciones"];
+    const headers = ["Empleado", "Edad", "Telefono", "Fecha de Ingreso"];
 
     useEffect(() => {
+        if (!departmentId) return;
+
         const slowTimeout = setTimeout(() => setIsSlow(true), 5000);
 
-        fetch(`http://localhost:5000/api/inventory/get`)
+        fetch(`http://localhost:5000/api/employees/get_by?field=id_departamento&value=${departmentId}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`Error ${res.status}: ${res.statusText}`);
@@ -23,17 +25,24 @@ function InventoryProducts({ filterProductName }) {
             })
             .then(result => {
                 if (result.success) {
-                    const mappedData = result.data.map(item => ({
-                        "Producto": item.nombre_producto,
-                        "Existencia": item.existencia,
-                        "Fecha de Alta": item.fecha_alta,
-                        "Fecha de Modificación": item.fecha_mod || item.fecha_alta,
-                        "Acciones": (
-                            <button className="px-2 py-1 rounded">
-                                Asignar
-                            </button>
-                        )
-                    }));
+                    const mappedData = result.data.map(item => {
+                        const birthDate = new Date(item.fecha_nac);
+                        const today = new Date();
+
+                        let age = today.getFullYear() - birthDate.getFullYear();
+                        const m = today.getMonth() - birthDate.getMonth();
+
+                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                            age--;
+                        }
+                        console.log(item);
+                        return {
+                            "Empleado": item.nombre,
+                            "Edad": age, 
+                            "Telefono": item.telefono, 
+                            "Fecha de Ingreso": item.fecha_alta
+                        };
+                    });
                     setData(mappedData);
                 } else {
                     console.error("Error en la respuesta del servidor:", result.message);
@@ -50,28 +59,20 @@ function InventoryProducts({ filterProductName }) {
             });
 
         return () => clearTimeout(slowTimeout);
-    }, []);
-
-    const filteredProducts = data
-        .filter(product => product["Existencia"] > 0)
-        .filter(product =>
-            filterProductName
-                ? product["Producto"].toLowerCase().includes(filterProductName.toLowerCase())
-                : true
-        );
+    }, [departmentId]);
 
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-6 text-gray-500 text-center bg-white">
                 <FontAwesomeIcon icon={faSpinner} spin size="3x" />
                 <p className="mt-2 text-lg">
-                    {isSlow ? "Esto está tardando más de lo normal..." : "Cargando productos..."}
+                    {isSlow ? "Esto está tardando más de lo normal..." : "Cargando empleados..."}
                 </p>
             </div>
         );
     }
 
-    const noData = error || filteredProducts.length === 0;
+    const noData = error || data.length === 0;
 
     return (
         <div className="text-center">
@@ -79,14 +80,14 @@ function InventoryProducts({ filterProductName }) {
                 <div className="flex flex-col items-center justify-center text-gray-500 py-6">
                     <FontAwesomeIcon icon={faBoxOpen} size="4x" />
                     <p className="mt-2 text-lg">
-                        {error ? "No se pudo obtener el inventario" : "No hay productos que coincidan"}
+                        {error ? "No se pudo obtener los empleados de este departamento" : "No hay empleados en este departamento"}
                     </p>
                 </div>
             ) : (
-                <DetailItem headers={headers} data={filteredProducts} />
+                <DetailItem headers={headers} data={data} />
             )}
         </div>
     );
 }
 
-export default InventoryProducts;
+export default DepartmentEmployees;

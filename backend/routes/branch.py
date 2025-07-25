@@ -50,7 +50,7 @@ def create():
 def update(id_sucursal):
     try:
         data = request.get_json()
-        # Optional: validate again on update
+
         model = Branch()
         instance = model.load(id_sucursal)
 

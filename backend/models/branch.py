@@ -57,7 +57,7 @@ class Branch():
         results = response.get("data")
 
         if results:
-            self._from_dict(results[0])  # sin zip
+            self._from_dict(results[0])
             if get_data:
                 response["data"] = self.to_dict()
                 return response, status

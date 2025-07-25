@@ -60,18 +60,31 @@ class Product():
     def delete(self):
         return self._database.delete(self._table, {"id_producto": self.id_producto})
 
-    
-    def load(self, record_id, get_data=False):
-        response, status = self._database.get_by("id_producto", record_id, self._table)
+    def load(self, parameter, value, get_data=False):
+        response, status = self._database.get_by(parameter, value, self._table)
         results = response.get("data")
 
         if results:
-            self._from_dict(results[0])
-            if get_data:
-                response["data"] = self.to_dict()
-                return response, status
+            if isinstance(results, list):
+                self._from_dict(results[0])
+                if get_data:
+                    response["data"] = [self._clone_with_data(row).to_dict() for row in results]
+                    return response, status
+            else:
+                self._from_dict(results)
+                if get_data:
+                    response["data"] = self.to_dict()
+                    return response, status
+
             return self
-        return response, status
+        else:
+            response["data"] = []
+            return response, status
+
+    def _clone_with_data(self, data):
+        instance = self.__class__()
+        instance._from_dict(data)
+        return instance
 
     def get_all(self):
         response, status = self._database.get_all(self._table)
