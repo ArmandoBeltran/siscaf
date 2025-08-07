@@ -1,42 +1,54 @@
 import React, { useState, useEffect } from "react";
 import SaleDetail from "./BranchSalesDetails";
+import { delSale } from "../../../../assets/js/salesfunctions";
 
 
 export default function SalesTable() {
   const [sales, setSales] = useState([]);
   const [expandedSale, setExpandedSale] = useState(null);
-    const [error, setError] = useState(null);
+  const [error, setError] = useState(null);
 
 
   // Obtener todas las ventas al cargar
   useEffect(() => {
-  fetch("http://localhost:5000/api/sales/get/generalSales")
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`Error ${res.status}: ${res.statusText}`);
-      }
-      return res.json();
-    })
-    .then(result => {
-      const response = Array.isArray(result) ? result[0] : result; // Tomar el primer elemento si es array
+    fetch("http://localhost:5000/api/sales/get/generalSales")
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+      })
+      .then(result => {
+        const response = Array.isArray(result) ? result[0] : result; // Tomar el primer elemento si es array
 
-      if (response.success) {
-        setSales(response.data);
-      } else {
-        console.error("Error en la respuesta del servidor:", response.message);
-        setError(response.message || "No se encontraron datos");
-      }
-    })
-    .catch(err => {
-      console.error("Error al obtener datos:", err);
-      setError(err.message);
-    });
-}, []);
+        if (response.success) {
+          setSales(response.data);
+        } else {
+          console.error("Error en la respuesta del servidor:", response.message);
+          setError(response.message || "No se encontraron datos");
+        }
+      })
+      .catch(err => {
+        console.error("Error al obtener datos:", err);
+        setError(err.message);
+      });
+  }, []);
 
 
   const toggleExpand = (saleId) => {
     setExpandedSale(expandedSale === saleId ? null : saleId);
   };
+
+  function DeleteSale(id_venta) {
+    const venta = { "id_venta": id_venta };
+    delSale(venta)
+      .then((res) => {
+        alert("Venta eliminada")
+      }).catch((err) => {
+        alert("Error al actualizar: " + err.message);
+      });
+
+  }
 
   return (
     <table className="table table-striped table-hover">
@@ -46,6 +58,7 @@ export default function SalesTable() {
           <th>Vendedor</th>
           <th>Sucursal</th>
           <th>Fecha</th>
+          <th>Eliminar</th>
           <th></th>
         </tr>
       </thead>
@@ -57,6 +70,7 @@ export default function SalesTable() {
               <td>{sale.vendedor}</td>
               <td>{sale.sucursal}</td>
               <td>{sale.fecha_venta}</td>
+              <th><button className="btn btn-danger" onClick={() => DeleteSale(sale.id_venta)}>Eliminar</button></th>
               <td>{expandedSale === sale.id_venta ? "▲" : "▼"}</td>
             </tr>
 
@@ -65,6 +79,7 @@ export default function SalesTable() {
                 <td colSpan={5}>
                   <SaleDetail saleId={sale.id_venta} />
                 </td>
+
               </tr>
             )}
           </React.Fragment>

@@ -92,7 +92,7 @@ def update(id_venta):
 def delete(id_venta):
     try:
         model = Sale()
-        instance = model.load(id_venta)
+        instance = model.load("id_venta",id_venta)
         if not instance:
             return jsonify({"message": "Venta no encontrada", "success": False}), 404
         
