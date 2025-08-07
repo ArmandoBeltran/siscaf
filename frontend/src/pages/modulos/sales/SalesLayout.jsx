@@ -4,10 +4,15 @@ import ToolBar from "../../../components/ToolBar";
 const modules = [
     {
         text: "Ventas", 
-        submenus: [
-            {url: "/Ventas", text: "Ventas"},
-            { url: "/GraficasVentas", text: "Reporte de Ventas",}
-        ]
+        url: "/Ventas"
+    },
+    {
+        text: "Reportes Graficados", 
+        url: "/GraficasVentas"
+    },
+    {
+        text: "Reporte de Ventas",
+        url: "/ReporteVentas"
     }
 ];
 

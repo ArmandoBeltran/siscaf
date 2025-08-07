@@ -120,6 +120,7 @@ class Sale():
             GROUP BY DATE(v.fecha_venta)
             ORDER BY fecha;
         '''
+        logging.debug(query)
         try:
             conn = self._database._get_connection()
             cursor = conn.cursor()
@@ -157,7 +158,7 @@ class Sale():
             LEFT JOIN catalogos.vendedores AS ven ON v.id_vendedor = ven.id_vendedor
             LEFT JOIN empleados.empleados AS emp ON ven.id_empleado = emp.id_empleado
             LEFT JOIN catalogos.sucursal AS suc ON v.id_sucursal = suc.id_sucursal
-            WHERE v.fecha_venta = %s
+            WHERE DATE(v.fecha_venta) = %s
             GROUP BY v.id_venta, fecha, emp.nombre, v.id_sucursal, suc.nombre
             ORDER BY fecha, vendedor, sucursal;
         '''
@@ -166,6 +167,8 @@ class Sale():
             cursor = conn.cursor()
             cursor.execute(query, (date,))
             results = cursor.fetchall()
+            logging.debug(results)
+            logging.debug(date)
             cursor.close()
             conn.close()
             columns = ["id_venta", "fecha", "vendedor", "sucursal",
