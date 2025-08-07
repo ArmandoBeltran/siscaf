@@ -22,3 +22,30 @@
     border-bottom: 2px solid #aa871d;
     outline: none;
 }
+.inputSalePwd::-webkit-inner-spin-button,
+.inputSalePwd::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+    }
+.inputSalePwd { -moz-appearance:textfield; }
+
+.inputSalePwd::placeholder{
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+}
+.inputSalePwd:focus{
+    border:3px solid green;
+}
+
+.inputSalePwd{
+    -webkit-text-security: disc;
+    border: 2px solid #1c1b1b;
+    border-radius: 10px;
+    font-size: 30px;
+    padding: 10px;
+    text-align: center;
+    height: 50px;
+    width: 200px;
+    
+}

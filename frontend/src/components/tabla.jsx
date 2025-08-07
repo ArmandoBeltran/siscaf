@@ -31,4 +31,5 @@ function Tabla({ datacatch }){
     );
 
 }
+
 export default Tabla

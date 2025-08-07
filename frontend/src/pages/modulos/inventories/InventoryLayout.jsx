@@ -5,7 +5,7 @@ const modules = [
     {
         text: "Inventarios",
         submenus: [
-            { url: "/Inventario", text: "Inventario sin Asignar" },
+            { url: "/Inventarios", text: "Inventario sin Asignar" },
             { url: "/InventarioSucursal", text: "Inventario por Sucursal" },
         ],
     },

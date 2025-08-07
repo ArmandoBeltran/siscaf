@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from models.sale_details import SaleDetails
+from datetime import datetime
+
 
 import logging
 
@@ -9,12 +11,42 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def validate_sale_details(data):
-    required = []
+    required = ["id_venta", "productos"]
+    product_required = [ "id_producto", "cantidad", "precio_unitario" ,"importe"] 
+    
     errors = {}
+
+    # Validación de los campos principales
     for field in required:
-        if field not in data or data[field] in [None, '']:
+        if field not in data or data[field] in [None, '', []]:
             errors[field] = f"{field} is required."
+
+    # Validar productos solo si existe la lista
+    if "productos" in data and isinstance(data["productos"], list):
+        productos_errors = []
+        for i, prod in enumerate(data["productos"]):
+            prod_errors = {}
+            for field in product_required:
+                if field not in prod or prod[field] in [None, '', 0]:
+                    prod_errors[field] = f"{field} is required."
+            if prod_errors:
+                productos_errors.append({f"producto_{i}": prod_errors})
+        
+        if productos_errors:
+            errors["productos"] = productos_errors
+
     return errors
+@sale_details_bp.route('/getDetail', methods=['GET'])
+def get_detail():
+    try: 
+        saleId = request.args.get("saleid")
+        if not saleId:
+            return jsonify({"message": "Missing 'saleid' parameter", 'success': False}), 400
+        model = SaleDetails()
+        result ,status = model.getDetail(saleid=saleId)
+        return result, status
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @sale_details_bp.route('/get', methods=['GET'])
 def get_all():
@@ -75,8 +107,85 @@ def get_sale_Sucursal(start_date, end_date):
         result = model.get_sucursalSales(start_date , end_date)
         return jsonify(result), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500  
+        return jsonify({"error": str(e)}), 500 
 
+@sale_details_bp.route('/get/get_top_products', methods=['GET'] )    
+def get_top10_products():
+    try:
+        start_date = request.args.get("start_date")
+        end_date = request.args.get("end_date")
+        if not start_date or not end_date:
+            return jsonify({"message": "Debe proporcionar fecha de inicio y fecha de fin" , "success": False}),400
+        try:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+        except ValueError:
+            return jsonify({
+                "message": "Formato de fecha inválido.",
+                "success": True
+            }), 400
+        model = SaleDetails()
+        response, status = model.get_Top_10_products(start_date=start_date , end_date=end_date)
+        return jsonify(response), status
+    except Exception as e:
+        return jsonify({
+            "message": str(e),
+            "success": False
+        }), 500 
+    
+@sale_details_bp.route('/get/year_comparative', methods=['GET'] )    
+def get_year_comparative():
+    try:
+        start_year = int(request.args.get("start_year"))
+        end_year = int (request.args.get("end_year"))
+        if not start_year or not end_year:
+            return jsonify({"message": "Debe proporcionar año de inicio y fin" , "success": False}),400
+       
+        model = SaleDetails()
+        response, status = model.get_Comparative(start_year=start_year , end_year=end_year)
+        return jsonify(response), status
+    except Exception as e:
+        return jsonify({
+            "message": str(e),
+            "success": False
+        }), 500 
+    
+@sale_details_bp.route('/get/seller_performance', methods=['GET'] )    
+def get_seller_performance():
+    try:
+        year = request.args.get("year")
+ 
+        if not year:
+            return jsonify({"message": "Debe proporcionar año" , "success": False}),400
+        model = SaleDetails()
+        response, status = model.get_SellerPerformance(year=year)
+        return jsonify(response), status
+    except Exception as e:
+        return jsonify({
+            "message": str(e),
+            "success": False
+        }), 500 
+    
+@sale_details_bp.route('/get/sales_season', methods=['GET'] )    
+def get_season_sales():
+    try:
+        start_date = request.args.get("start_date")
+        end_date= request.args.get('end_date')
+ 
+        if not start_date or not end_date:
+            return jsonify({"message": "Debe proporcionar año" , "success": False}),400
+        model = SaleDetails()
+        response, status = model.get_season_sales(start_date=start_date , end_date=end_date)
+        return jsonify(response), status
+    except Exception as e:
+        return jsonify({
+            "message": str(e),
+            "success": False
+        }), 500 
+     
+
+    
 @sale_details_bp.route('/add', methods=['POST'])
 def create():
     try:
@@ -84,8 +193,18 @@ def create():
         errors = validate_sale_details(data)
         if errors:
             return jsonify({"errors": errors}), 400
-        model = SaleDetails(data)
-        result, status = model.save()
+        for prod in data["productos"]:
+            model = SaleDetails({
+                "id_venta": data["id_venta"],
+                "id_producto": prod["id_producto"],
+                "cantidad": prod["cantidad"],
+                "precio_unitario": prod["precio_unitario"], 
+                "importe": prod["importe"],                  
+                "descuento": 0
+                
+            })
+            result, status = model.save()
+        
         return result, status
     except Exception as e:
         return jsonify({"message": str(e), 'success': False}), 500
