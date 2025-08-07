@@ -26,7 +26,7 @@ function Home() {
         </div>
         <div className="home-buttons">
           <HomeButton 
-            route="/Inventario"
+            route="/Inventarios"
             img={InventoryImg}
             alt="Módulo de Inventarios"
             text="Inventarios"

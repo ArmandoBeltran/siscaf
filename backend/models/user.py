@@ -4,7 +4,7 @@ import json
 
 from datetime import datetime, timedelta
 
-
+import logging
 
 class User(): 
 
@@ -98,16 +98,17 @@ class User():
             WHERE correo = %s AND clave = %s AND estatus = 'true' ''',
             (email, clave)
         )
+
         if result:
-            columns = ["id_usu", "id_empleado", "nombre_usu", "id_departamento", "correo"]
-            data = [dict(zip(columns, row)) for row in result]
+            user_data = result[0]
+            logging.debug(f"Login user_data: {user_data}")
             
-            user_data = data[0]
-            session_id = self.create_session(user_data['id_usu'] , user_data)
-        
-            
-            return user_data , session_id
-        
+            # Validación para asegurar que sea int
+            user_id = int(user_data['id_usu'])
+
+            session_id = self.create_session(user_id, user_data)
+            return user_data, session_id
+
         return None
     
     def delete_Session(self, session_id):
@@ -122,11 +123,15 @@ class User():
         ''', (session_id,))
         
         if result:
-            columns = ["session_id", "user_id", "expires_at"]
-            return dict(zip(columns, result[0]))
+            return result[0]  # ← ya es un dict real
         return None
 
     def get_user_by_id(self, user_id):
+        try:
+            user_id = int(user_id)
+        except ValueError:
+            return None
+
         result = self._database.execute_query('''
             SELECT id_usu, id_empleado, nombre_usu, id_departamento, correo
             FROM empleados.usuarios
@@ -134,6 +139,5 @@ class User():
         ''', (user_id,))
         
         if result:
-            columns = ["id_usu", "id_empleado", "nombre_usu", "id_departamento", "correo"]
-            return dict(zip(columns, result[0]))
+            return result[0]  # Ya es dict por RealDictCursor
         return None

@@ -74,3 +74,66 @@ def delete(id_inv_suc):
         return result, status
     except Exception as e:
         return jsonify({"message": str(e), "success": False}), 500
+
+@branch_inventory_bp.route('/assign', methods=['POST'])
+def assign_product_to_branch():
+    try:
+        data = request.get_json()
+        id_producto = data.get("id_producto")
+        id_sucursal = data.get("id_sucursal")
+        cantidad = int(data.get("existencia", 0))
+        logging.debug(data)
+
+        if not all([id_producto, id_sucursal, cantidad]):
+            return jsonify({"success": False, "message": "Datos incompletos"}), 400
+
+        from models.inventory import Inventory
+        inventory_model = Inventory()
+        all_inv, _ = inventory_model.get_all()
+        matching = next((item for item in all_inv["data"] if item["id_producto"] == id_producto), None)
+
+        if not matching:
+            return jsonify({"success": False, "message": "Producto no existe en inventario general"}), 404
+        if matching["existencia"] < cantidad:
+            return jsonify({"success": False, "message": "Stock insuficiente"}), 400
+
+        # 2. Restar del inventario general
+        inventory = Inventory()
+        inventory.id_inventario = matching["id_inventario"]
+        updated_existencia = matching["existencia"] - cantidad
+        inventory.update({"existencia": updated_existencia})
+
+        # 3. Verificar si ya existe inventario_suc para ese producto y sucursal
+        db = inventory._database  # Reutilizamos la instancia de DB
+        check_result, _ = db.get_by_multiple(
+            {"id_producto": id_producto, "id_sucursal": id_sucursal},
+            "catalogos.inventario_suc"
+        )
+        existing_rows = check_result.get("data", [])
+
+        if existing_rows:
+            existing = existing_rows[0]
+            logging.debug(existing)
+            id_inv_suc = existing["id_inv_suc"]
+            nueva_existencia = existing["existencia"] + cantidad
+            nueva_total = (existing["cantidad_total"] or 0) + cantidad
+
+            db.update("catalogos.inventario_suc", {
+                "existencia": nueva_existencia,
+                "cantidad_total": nueva_total
+            }, {"id_inv_suc": id_inv_suc})
+        else:
+            suc_model = BranchInventory({
+                "id_producto": id_producto,
+                "id_sucursal": id_sucursal,
+                "existencia": cantidad,
+                "cantidad_vendida": 0,
+                "cantidad_total": cantidad
+            })
+            suc_model.save()
+
+        return jsonify({"success": True, "message": "Producto asignado correctamente"}), 200
+
+    except Exception as e:
+        logger.exception("Error en asignación de producto")
+        return jsonify({"success": False, "message": str(e)}), 500

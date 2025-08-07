@@ -65,7 +65,7 @@ class BranchInventory():
                     product_response, _ = Product().load("id_producto", item.get("id_producto"), get_data=True)
                     product_name = None
                     if product_response.get("success"):
-                        product_data = product_response.get("data")
+                        product_data = product_response.get("data")[0]
                         if isinstance(product_data, dict):
                             product_name = product_data.get("nombre")
 
@@ -93,5 +93,3 @@ class BranchInventory():
         
         response["data"] = data
         return response, status
-
-   
