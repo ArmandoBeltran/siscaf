@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Modal } from "bootstrap";
-import ModalForm from "../../../components/modal";
 import EmployeeForm from "../../../components/EmployeeForm";
 import EmployeeCard from "../../../components/EmployeeCard";
 import "../../../assets/css/product-list.css";
 import AdminLayout from "./AdminLayout";
+import ModalTemplate from "../../../components/ModalTemplate";
 
 function EmployeeList() {
   const [employees, setEmployees] = useState([]);
@@ -186,7 +186,7 @@ function EmployeeList() {
         )}
       </div>
 
-      <ModalForm
+      <ModalTemplate
         id="modalCreateEmployee"
         titulo={isEditMode ? "Editar Empleado" : "Crear Empleado"}
         form={
