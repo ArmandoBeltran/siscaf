@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "bootstrap";
 import ModalTemplate from "../../../components/ModalTemplate";
-import ModalTemplate from "../../../components/ModalTemplate";
 import DepartmentForm from "../../../components/DepartmentForm";
 import DepartmentCard from "../../../components/DepartmentCard";
 import '../../../assets/css/product-list.css';

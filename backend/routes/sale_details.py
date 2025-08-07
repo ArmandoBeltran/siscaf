@@ -215,10 +215,11 @@ def update(id_detalle):
         data = request.get_json()
 
         model = SaleDetails()
-        sale_detail = model.load(id_detalle)
+        sale_detail = model.load("id_detalle" , id_detalle)
         if not sale_detail:
             return jsonify({"message": "Detalle de venta no encontrado"}), 404
-        
+        if 'id_detalle' in data:
+            del data['id_detalle']
         result, status = model.update(data)
         return result, status
     except Exception as e:
@@ -228,7 +229,7 @@ def update(id_detalle):
 def delete(id_detalle):
     try:
         model = SaleDetails()
-        sale_detail = model.load(id_detalle)
+        sale_detail = model.load("id_detalle", id_detalle)
 
         if not sale_detail:
             return jsonify({"message": "Detalle de venta no encontrado", "success": False}), 404

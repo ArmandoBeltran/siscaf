@@ -86,7 +86,7 @@ class SaleDetails():
             response["data"] = []
             return response, status
     def getDetail(self , saleid):
-        query='''SELECT a.id_detalle , b.nombre , a.cantidad, a.precio_unitario , a.importe  FROM catalogos.detalle_venta a 
+        query='''SELECT a.id_detalle , a.id_producto,  b.nombre , a.cantidad, CAST(a.precio_unitario AS NUMERIC) as precio_unitario , CAST(a.importe AS NUMERIC)  as importe FROM catalogos.detalle_venta a 
             JOIN catalogos.producto b ON (a.id_producto = b.id_producto) WHERE id_venta = %s;'''
         try: 
             conn = self._database._get_connection()
@@ -95,7 +95,7 @@ class SaleDetails():
             results = cursor.fetchall()
             cursor.close()
             conn.close()
-            columns = ["id_detalle", "producto" ,"cantidad" ,"precio_unitario", "importe"]
+            columns = ["id_detalle","id_producto", "producto" ,"cantidad" ,"precio_unitario", "importe"]
             data = [dict(zip(columns, row)) for row in results]
 
             logging.info(data)
