@@ -32,7 +32,7 @@ function Home() {
             text="Inventarios"
             description="Gestión de productos, materiales y existencias."/>
           <HomeButton 
-            route="#"
+            route="/ReporteDepartamentosEmpleados"
             img={AdministrationImg}
             alt="Módulo de Administración"
             text="Administración"

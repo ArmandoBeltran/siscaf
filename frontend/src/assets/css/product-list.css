@@ -1,0 +1,87 @@
+.main--content--list {
+    display: flex;
+    justify-content: left;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+.card {
+    display: flex;
+    width: 400px;
+    height: 150px;
+    border: 1px solid #2e819dab;
+    margin: 20px;
+    border-radius: 10px;
+    background-color: #EEF5FF;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.02);
+    background-color: #fafcff;
+}
+
+.card--img {
+    background-color: #2e819dab;
+    border-radius: 10px 0 0 10px;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card--img img {
+    max-width: 100px;
+    max-height: 100px;
+}
+
+.card--info {
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.card--info h2 {
+    color: black;
+    font-size: 1.1rem;
+}
+
+.card--info--details {
+    margin-top: 10px;
+    color: #5e5e5e;
+}
+
+.details {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.no--content {
+    text-align: center;
+    margin: 40px auto;
+}
+
+.main--content--list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    padding: 20px;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.btn-create-product {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-create-product:hover {
+    background-color: #218838;
+}

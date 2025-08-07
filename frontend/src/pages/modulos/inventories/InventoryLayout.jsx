@@ -6,7 +6,7 @@ const modules = [
         text: "Inventarios",
         submenus: [
             { url: "/Inventarios", text: "Inventario sin Asignar" },
-            { url: "/InventarioSucursal", text: "Inventario por Sucursal" },
+            { url: "/InventariosSucursal", text: "Inventario por Sucursal" },
         ],
     },
     {
@@ -14,7 +14,7 @@ const modules = [
         submenus: [
             { url: "/Productos", text: "Productos" },
             { url: "/Categorias", text: "Categorías" },
-            { url: "/ReporteProductosCategoria", text: "Reporte de Productos por Categoría"}
+            { url: "/ReporteCategorias", text: "Reporte de Productos por Categoría"}
         ],
     },
 ];

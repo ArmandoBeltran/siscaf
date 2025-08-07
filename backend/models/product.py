@@ -3,6 +3,12 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+from datetime import datetime
+
+import requests
+
+ODOO_API = "https://ea0c7dc76b51.ngrok-free.app/external_api/products"
+
 class Product(): 
 
     def __init__(self, data=None):
@@ -28,6 +34,8 @@ class Product():
             self._from_dict(data)
 
     def _from_dict(self, data):
+        logging.debug(data)
+        logging.debug("#"*1000)
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
@@ -55,6 +63,9 @@ class Product():
         return self._database.insert(self._table, self.to_dict())
     
     def update(self, new_data): 
+        if 'id_producto' in new_data:
+            new_data = dict(new_data)
+            new_data.pop('id_producto')
         return self._database.update(self._table, new_data, {"id_producto": self.id_producto})
 
     def delete(self):
@@ -98,3 +109,50 @@ class Product():
         
         response["data"] = data
         return response, status
+    
+    def format_date(self, value, with_time=False):
+        if isinstance(value, datetime):
+            return value.strftime('%Y-%m-%d %H:%M:%S') if with_time else value.strftime('%Y-%m-%d')
+        return value  # si ya viene como string o None
+
+    
+    def sync_with_odoo(self, action):
+        # Diccionario original de datos
+        data = self.to_dict(include_all=True)
+
+        # Mapea los campos de tu objeto a los nombres esperados en Odoo:
+        precio_raw = data.get('precio', 0)
+        if isinstance(precio_raw, str):
+            precio_raw = precio_raw.replace('$', '').replace(',', '').strip()
+        try:
+            list_price = float(precio_raw)
+        except:
+            list_price = 0.0  # O maneja el error como quieras
+
+        payload = {
+            'x_id_producto': data.get('id_producto'),
+            'x_color': data.get('color'),
+            'x_talla': data.get('talla'),
+            'x_altura_tacon': float(data.get('altura_tacon', 0)) if data.get('altura_tacon') else 0.0,
+            'x_fecha_alta': self.format_date(data.get('fecha_alta')),           # Formato Y-m-d
+            'x_fecha_mod': self.format_date(data.get('fecha_mod'), True),       # Formato Y-m-dTH:M:S
+            'x_material': data.get('material'),
+            'x_ocasion': data.get('ocasion'),
+            'x_tipo_tacon': data.get('tipo_tacon'),
+            'x_id_categoria': int(data.get('id_categoria')) if data.get('id_categoria') else None,
+            'x_estatus': bool(data.get('estatus')) if 'estatus' in data else True,
+            'name': data.get('nombre'),
+            'list_price': list_price
+        }
+
+        logging.debug(f"[Odoo Payload] {payload}")
+
+        try:
+            if action == 'create':
+                requests.post(ODOO_API, json=payload)
+            elif action == 'update':
+                requests.put(f"{ODOO_API}/{self.id_producto}", json=payload)
+            elif action == 'delete':
+                requests.delete(f"{ODOO_API}/{self.id_producto}")
+        except Exception as e:
+            logging.error(f"Error syncing with Odoo: {str(e)}")

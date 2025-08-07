@@ -10,17 +10,16 @@ class DataBase():
         self._db_host     = os.getenv("DB_HOST", "localhost")
         self._db_name     = os.getenv("DB_NAME", "andres_db")
         self._db_user     = os.getenv("DB_USER", "postgresql")
-        self._db_password = os.getenv("DB_PASSWORD", "admin123")
+        self._db_password = os.getenv("DB_PASSWORD", "admin")
 
     def _get_connection(self): 
         conn = psycopg2.connect(
-            host = self._db_host, 
-            database = self._db_name,
-            user = self._db_user,
-            password = self._db_password,
-            port = 5432
+            host="localhost",
+            database="andres_db",
+            user="postgres",
+            password="admin",
+            port=5432
         )
-
         return conn
     
     def _prepare_response(self, success, message, data, status):
@@ -46,8 +45,8 @@ class DataBase():
 
             response, status = self._prepare_response(True, "success", data, 200)
             return response, status
-        except Exception as e: 
-            return self._prepare_response(False, "error", str(e), 400)
+        except Exception as e:
+            return self._prepare_response(False, "error", {"error": str(e)}, 400)
 
     def get_by(self, field, value, table): 
         try: 
@@ -77,18 +76,25 @@ class DataBase():
             placeholders = ', '.join(['%s'] * len(data))
             values = tuple(data.values())
 
-            query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders});"
-            logging.info(query)
-            cursor.execute(query, values)
+            if table == "catalogos.producto":
+                query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders}) RETURNING id_producto;"
+                cursor.execute(query, values)
+                inserted_id = cursor.fetchone()[0]
+                response = self._prepare_response(True, "success", {"id_producto": inserted_id}, 201)
+            else:
+                query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
+                cursor.execute(query, values)
+                response = self._prepare_response(True, "success", {"message": "Dato insertado"}, 201)
+
             conn.commit()
 
             cursor.close()
             conn.close()
 
-            response = self._prepare_response(True, "success", "Record successfully created", 201)
-
             return response
+
         except Exception as e:
+            logger.error(f"[insert] Error al insertar en {table}: {str(e)}")
             return self._prepare_response(False, "error", str(e), 400)
 
     def update(self, table, data: dict, where_clause: dict):
@@ -135,11 +141,12 @@ class DataBase():
         except Exception as e:
             return self._prepare_response(False, "error", str(e), 400)
         
+    import psycopg2.extras
+
     def execute_query(self, query, params=None):
-        """Generic method to execute safe parameterized queries."""
         try:
             with self._get_connection() as conn:
-                with conn.cursor() as cursor:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                     cursor.execute(query, params or ())
                     if query.strip().upper().startswith("SELECT"):
                         return cursor.fetchall()
@@ -149,7 +156,23 @@ class DataBase():
             logger.error(f"Query failed: {query} | Error: {str(e)}")
             raise
 
-
-
-        
     
+    def get_by_multiple(self, filters: dict, table: str):
+        where_clauses = " AND ".join(f"{k} = %s" for k in filters)
+        values = list(filters.values())
+        query = f"SELECT * FROM {table} WHERE {where_clauses}"
+        try:
+            results = self.execute_query(query, values)
+            response = {
+                "success": True,
+                "data": results
+            }
+            status = 200
+        except Exception as e:
+            response = {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }
+            status = 500
+        return response, status

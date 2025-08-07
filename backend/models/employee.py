@@ -54,6 +54,9 @@ class Employee:
         return self._database.insert(self._table, self.to_dict())
         
     def update(self, new_data):
+        if "id_empleado" in new_data: 
+            new_data = dict(new_data)
+            new_data.pop("id_empleado")
         return self._database.update(self._table, new_data, {"id_empleado": self.id_empleado})
     
     def delete(self):

@@ -16,7 +16,7 @@ class Category():
         self.descripcion = None
         self.genero = None
         self.temporada = None
-        self.estado = None
+        self.estatus = None
         self.fecha_alta = None
         self.fecha_mod = None
 
@@ -35,7 +35,7 @@ class Category():
             "descripcion": self.descripcion,
             "genero": self.genero,
             "temporada": self.temporada,
-            "estado": self.estado,
+            "estatus": self.estatus,
             "fecha_alta": self.fecha_alta,
             "fecha_mod": self.fecha_mod,
         }
@@ -46,6 +46,9 @@ class Category():
         return self._database.insert(self._table, self.to_dict())
         
     def update(self, new_data): 
+        if 'id_categoria' in new_data:
+            new_data = dict(new_data)
+            new_data.pop('id_categoria')
         return self._database.update(self._table, new_data, {"id_categoria": self.id_categoria})
 
     def delete(self):
@@ -56,7 +59,6 @@ class Category():
     def load(self, field, value, get_data=False):
         response, status = self._database.get_by(field, value, self._table)
         results = response.get("data", [])
-
         if results: 
             self._from_dict(results[0])
             if get_data:

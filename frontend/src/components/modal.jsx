@@ -32,5 +32,4 @@ function ModalForm({ modalID, ModalTitle, ModalLayout, content, Modalbuttons }) 
   );
 }
 
-
 export default ModalForm;

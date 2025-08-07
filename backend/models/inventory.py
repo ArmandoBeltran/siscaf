@@ -100,3 +100,7 @@ class Inventory():
 
         response["data"] = data
         return response, status
+    
+    def get_by_producto(self, id_producto):
+        response, status = self._database.get_by("id_producto", id_producto, self._table)
+        return response, status
