@@ -26,8 +26,9 @@ def user_login():
             'session_id',
             value=session_id,
             httponly=True,
-            secure=True,  # Solo en HTTPS
-            samesite='Lax'
+            secure=False,  # Solo en HTTPS
+            samesite='Lax',
+            path='/'
             )
             return response
         else:

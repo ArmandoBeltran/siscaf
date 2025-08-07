@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def validate_category(data):
-    required = ["descripcion", "estado", "genero", "nombre", "temporada"]
+    required = ["descripcion", "estatus", "genero", "nombre", "temporada"]
     errors = {}
     for field in required:
         if field not in data or data[field] in [None, '']:
@@ -47,6 +47,8 @@ def create():
     try:
         data = request.get_json()
         errors = validate_category(data)
+        logging.debug(data)
+        logging.debug("$"*100)
         if errors:
             return jsonify({"errors": errors, "success": False}), 400
         model = Category(data)
@@ -65,8 +67,10 @@ def update(id_categoria):
         model = Category()
         instance = model.load("id_categoria", id_categoria)
 
-        if not instance:
+        if isinstance(instance, tuple):
+            response, status = instance
             return jsonify({"message": "Categoría no encontrada", "success": False}), 404
+
         
         result, status = instance.update(data)
         return result, status

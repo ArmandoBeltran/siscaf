@@ -28,14 +28,45 @@ def get_by_id(id_inventario):
         return jsonify({"message": str(e), "success": False}), 500
 
 @inventory_bp.route('/create', methods=['POST'])
-def create():
+def create_or_update_inventory():
     try:
         data = request.get_json()
-        model = Inventory(data)
-        result, status = model.save()
+        id_producto = data.get('id_producto')
+        cantidad_nueva = float(data.get('cantidad_producida', 0))
+        logging.debug(id_producto)
+        logging.debug(data)
+
+        if not id_producto or cantidad_nueva <= 0:
+            return jsonify({"message": "Datos inválidos", "success": False}), 400
+
+        # Verificar si ya existe inventario para este producto
+        model = Inventory()
+        response, status = model.get_by_producto(id_producto)
+        inventarios = response.get("data", [])
+
+        if inventarios:
+            # Ya existe: actualizar sumando la cantidad
+            inventario_existente = inventarios[0]
+            model._from_dict(inventario_existente)
+            nueva_existencia = (model.existencia or 0) + cantidad_nueva
+            nueva_cantidad_producida = (model.cantidad_producida or 0) + cantidad_nueva
+
+            update_data = {
+                "cantidad_producida": nueva_cantidad_producida,
+                "existencia": nueva_existencia
+            }
+
+            result, status = model.update(update_data)
+        else:
+            # No existe: crear nuevo registro
+            data["existencia"] = cantidad_nueva
+            model = Inventory(data)
+            result, status = model.save()
+
         return result, status
+
     except Exception as e:
-        logger.error(f"Error al crear inventario: {e}")
+        logger.error(f"Error al crear/actualizar inventario: {e}")
         return jsonify({"message": str(e), "success": False}), 500
 
 @inventory_bp.route('/update/<int:id_inventario>', methods=['PUT'])

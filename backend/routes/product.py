@@ -45,44 +45,56 @@ def get_by():
 def create():
     try:
         data = request.get_json()
+        logger.debug(f"[CREATE] Payload recibido: {data}")
         errors = validate_product(data)
         if errors:
+            logger.warning(f"[CREATE] Errores de validación: {errors}")
             return jsonify({"errors": errors}), 400
+
         model = Product(data)
         result, status = model.save()
+        logger.debug(f"[CREATE] Resultado save: {result}")
+
+        if result["success"]:
+            inserted_id = result["data"].get("id_producto")
+            model.id_producto = inserted_id
+            model.sync_with_odoo('create')
+
         return result, status
+
     except Exception as e:
+        logger.error(f"[CREATE] Excepción: {str(e)}")
         return jsonify({"message": str(e), 'success': False}), 500
     
 @product_bp.route('/update/<int:id_producto>', methods=['PUT'])
 def update(id_producto):
     try:
         data = request.get_json()
-        #errors = validate_product(data)
-        #if errors:
-        #    return jsonify({"errors": errors}), 400
+        logger.debug(f"Update data received: {data}")
         
         model = Product()
-        product = model.load(id_producto)
+        product = model.load('id_producto', id_producto)
 
         if not product:
-            return jsonify({"message": "Producto no encontrado"}), 404
+            return jsonify({"message": "Producto no encontrado", 'success': False}), 404
         
         result, status = product.update(data)
-
+        product.sync_with_odoo('update')
         return result, status
     except Exception as e:
+        logging.debug(e)
         return jsonify({"message": str(e), 'success': False}), 500
     
 @product_bp.route('/delete/<int:id_producto>', methods=['DELETE'])
 def delete(id_producto):
     try:
-        model   = Product()
-        product = model.load(id_producto) 
+        model = Product()
+        product = model.load("id_producto", id_producto)
         if not product:
             return jsonify({"message": "Producto no encontrado", "success": False}), 404
         
         result, status = model.delete()
+        product.sync_with_odoo('delete')
         return result, status
     except Exception as e:
         return jsonify({"message": str(e), 'success': False}), 500
