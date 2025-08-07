@@ -46,11 +46,14 @@ class SaleDetails():
             "fecha_alta": self.fecha_alta,
             "fecha_mod": self.fecha_mod,
         }
+        return data if include_all else {k: v for k, v in data.items() if v is not None}
+    
+
     def fomatDate(self, date):
         dt = datetime.strptime(date, "%a, %d %b %Y %H:%M:%S %Z")
         return dt.strftime("%Y-%m-%d")
 
-        return data if include_all else {k: v for k, v in data.items() if v is not None}
+       
 
     def save(self):
         return self._database.insert(self._table, self.to_dict())
@@ -82,6 +85,33 @@ class SaleDetails():
         else:
             response["data"] = []
             return response, status
+    def getDetail(self , saleid):
+        query='''SELECT a.id_detalle , b.nombre , a.cantidad, a.precio_unitario , a.importe  FROM catalogos.detalle_venta a 
+            JOIN catalogos.producto b ON (a.id_producto = b.id_producto) WHERE id_venta = %s;'''
+        try: 
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, (saleid,))
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["id_detalle", "producto" ,"cantidad" ,"precio_unitario", "importe"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de comparativa recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
     
     '''Obtener ventas por género de una fecha a otra fecha'''
     def get_saleByGender(self , start_date=None, end_date=None): 
@@ -160,6 +190,156 @@ class SaleDetails():
                 })
             return data
         return None
+    
+    def get_Top_10_products(self, start_date, end_date):
+        query = '''
+        SELECT b.nombre, (SUM(a.cantidad) * precio_unitario) AS Ganancias 
+        FROM catalogos.ventas v
+        JOIN  catalogos.detalle_venta a ON (a.id_venta = v.id_venta)
+        JOIN catalogos.producto b ON (a.id_producto = b.id_producto)
+        WHERE v.fecha_venta BETWEEN %s AND %s
+        GROUP BY b.nombre, a.precio_unitario, a.importe
+        ORDER by Ganancias DESC 
+        LIMIT 10'''
+        try:
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, (start_date, end_date))
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["producto", "ganancias"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de productos mas vendidos recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
+        
+    def get_Comparative(self, start_year, end_year):
+        query = '''
+        WITH meses AS (
+            SELECT generate_series(1, 12) AS mes
+        ),anios AS (
+            SELECT %s AS anio UNION SELECT %s
+        ),meses_anios AS (
+            SELECT m.mes, a.anio
+            FROM meses m
+            CROSS JOIN anios a
+        )SELECT 
+            COALESCE(COUNT(v.id_venta), 0) as ventas, ma.mes, ma.anio
+        FROM meses_anios ma
+        LEFT JOIN catalogos.ventas v ON EXTRACT(MONTH FROM v.fecha_venta) = ma.mes 
+            AND EXTRACT(YEAR FROM v.fecha_venta) = ma.anio
+            AND (ma.anio = %s OR ma.anio = %s)
+        GROUP BY 
+            ma.mes, ma.anio
+        ORDER BY 
+            ma.anio, ma.mes;'''
+        try:
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, (start_year, end_year, start_year, end_year))
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["sale", "month", "year"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de comparativa recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
+
+
+    def get_SellerPerformance(self, year):
+        query = '''
+            SELECT c.nombre as Vendedor, SUM(dt.cantidad *  CAST(dt.precio_unitario AS NUMERIC)) AS total , EXTRACT(MONTH FROM fecha_venta)AS mes
+            FROM catalogos.detalle_venta dt
+            JOIN catalogos.ventas a ON (a.id_venta = dt.id_venta)
+            JOIN catalogos.vendedores b ON (a.id_vendedor = b.id_vendedor)
+            JOIN empleados.empleados c ON (b.id_empleado = c.id_empleado)
+            WHERE EXTRACT(YEAR FROM a.fecha_venta) = %s
+            GROUP BY c.nombre , mes
+            ORDER BY mes ;'''
+        try:
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, (year,))
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["vendedor", "ganancias", "mes"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de comparativa recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
+        
+    def get_season_sales( self , start_date , end_date):
+        query = '''SELECT SUM(b.cantidad) AS ventas, d.temporada
+                FROM catalogos.ventas a 
+                JOIN catalogos.detalle_venta b ON (a.id_venta = b.id_venta)
+                JOIN catalogos.producto c ON (b.id_producto = c.id_producto)
+                JOIN catalogos.categoria d ON (c.id_categoria = d.id_categoria)
+                WHERE a.fecha_venta BETWEEN '2025-01-01' AND '2025-12-31'
+                GROUP BY d.temporada'''
+        try: 
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, (start_date, end_date))
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["ventas", "temporada"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de comparativa recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
+
 
     def _clone_with_data(self, data: dict) -> dict:
         item = self.__class__(data)

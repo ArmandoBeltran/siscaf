@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { faBoxOpen, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DetailItem from "../../../../components/reports/DetailItem";
+import SaleDetail from "./BranchSalesDetails";
 
 function SaleDetails({ saleId }) {
     const [data, setData] = useState([]);

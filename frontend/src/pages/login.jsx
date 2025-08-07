@@ -1,5 +1,4 @@
 import React from "react";
-import '../components/modal'
 import '../assets/css/login.css'
 import '../assets/css/base.css'
 import '../assets/css/inputs.css'

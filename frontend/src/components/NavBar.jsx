@@ -4,6 +4,7 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 import '../assets/css/navbar.css';
 import Zapato from '../assets/img/Zapato.png';
+import DropdownUser from './dropdownUser';
 
 function NavBar({ modules }) {
     return (
@@ -59,8 +60,7 @@ function NavBar({ modules }) {
                 </ul>
 
                 <div className="navbar-user dropdown">
-                    <FontAwesomeIcon icon={faUser} size="2x" />
-                    {/* Aquí puedes agregar el dropdown del usuario si quieres */}
+                    <DropdownUser></DropdownUser>
                 </div>
             </div>
         </nav>

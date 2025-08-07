@@ -34,8 +34,13 @@ class Sale():
 
         return data if include_all else {k: v for k, v in data.items() if v is not None}
 
-    def save(self): 
-        return self._database.insert(self._table, self.to_dict())
+    def save(self ,id_vendedor, id_sucursal ): 
+       id_venta = self._database.insert_and_return_id('''
+            INSERT INTO catalogos.ventas(
+            id_vendedor, id_sucursal)
+            VALUES (%s, %s) RETURNING id_venta;
+        ''', (id_vendedor, id_sucursal))
+       return id_venta
 
     def update(self, new_data):
         return self._database.update(self._table, new_data, {"id_venta": self.id_venta})
@@ -56,24 +61,38 @@ class Sale():
         return None
     
     def getSales(self):
-        result = self._database.execute_query('''
+        query = '''
             SELECT a.id_venta , b2.nombre , c.nombre , fecha_venta 
             FROM catalogos.ventas a 
             JOIN catalogos.vendedores b1 ON (a.id_vendedor = b1.id_vendedor)
             JOIN empleados.empleados b2 ON (b1.id_empleado = b2.id_empleado)
             JOIN catalogos.sucursal c ON (a.id_sucursal = c.id_sucursal)
-            WHERE a.fecha_venta BETWEEN '2025-01-01' AND '2025-12-31' ''')
-        data=[]
-        if result:
-            for row in result:
-                data.append({
-                    'id_venta': row[0],
-                    'nombre': row[1],
-                    'sucursal': row[2],
-                    'fecha_venta': row[3]
-                })
-            return data
-        return None
+			ORDER BY fecha_venta DESC
+            '''
+        try:
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query)
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["id_venta", "vendedor" ,"sucursal" ,"fecha_venta"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de comparativa recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
     
     def get_all(self):
         response, status = self._database.get_all(self._table)
