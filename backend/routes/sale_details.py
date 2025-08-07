@@ -78,8 +78,11 @@ def get_sale_Gender(start_date, end_date):
     try:
         model = SaleDetails()
         result = model.get_saleByGender(start_date , end_date)
+        logging.debug(result)
         return jsonify(result), 200
     except Exception as e:
+        logging.debug(str(e))
+        logging.debug("#"*1000)
         return jsonify({"error": str(e)}), 500  
     
 @sale_details_bp.route('/get/saleByCategory/<start_date>/<end_date>',methods=['GET'])

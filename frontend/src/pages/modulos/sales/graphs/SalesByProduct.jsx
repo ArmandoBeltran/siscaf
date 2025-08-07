@@ -36,15 +36,17 @@ export default function SalesByProduct({ start_date  , end_date , id_producto })
                     return res.json();
                 })
                 .then(result => {
-                    if (result != null) {
-                        const mappedData = result.map(item => ({
+                    const res = result[0].success;
+                    if (res) {
+                        const data = result[0].data;
+                        const mappedData = data.map(item => ({
                             fecha_alta: item.fecha_alta,
                             ventas: item.ventas,
                             nombre:item.nombre
                         }));
                         setData(mappedData);
                     } else {
-                        console.error("Error en la respuesta del servidor:", result?.message);
+                        console.error("Error en la respuesta del servidor:", result[0].message);
                         setError("No se encontraron datos");
                     }
                 })

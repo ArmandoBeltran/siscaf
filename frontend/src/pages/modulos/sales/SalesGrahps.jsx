@@ -56,7 +56,7 @@ function SalesGraphs() {
         <div className="container-fluid text-center">
           <div className="row mb-4">
             <ul class="nav nav-tabs" id="myTab" role="tablist" >
-              <li class="nav-item" role="tactico" >
+              <li className="nav-item" role="tactico" >
                 <button class="nav-link active" id="categoria-tab" data-bs-toggle="tab" data-bs-target="#categoria" type="button" role="tab" aria-controls="categoria" aria-selected="true">Ventas por Categoría</button>
               </li>
               <li class="nav-item" role="tactico">

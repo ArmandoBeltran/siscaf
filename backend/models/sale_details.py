@@ -85,6 +85,7 @@ class SaleDetails():
         else:
             response["data"] = []
             return response, status
+        
     def getDetail(self , saleid):
         query='''SELECT a.id_detalle , b.nombre , a.cantidad, a.precio_unitario , a.importe  FROM catalogos.detalle_venta a 
             JOIN catalogos.producto b ON (a.id_producto = b.id_producto) WHERE id_venta = %s;'''
@@ -114,63 +115,109 @@ class SaleDetails():
             }, 500
     
     '''Obtener ventas por género de una fecha a otra fecha'''
-    def get_saleByGender(self , start_date=None, end_date=None): 
-        result = self._database.execute_query(
-            '''SELECT COUNT(a.id_detalle) AS ventas, c.genero
+    def get_saleByGender(self , start_date=None, end_date=None):
+        query = '''SELECT COUNT(a.id_detalle) AS ventas, c.genero
                 FROM catalogos.detalle_venta a
                 JOIN catalogos.producto b ON (a.id_producto = b.id_producto)
                 JOIN catalogos.categoria c ON (b.id_categoria = c.id_categoria)
                 WHERE a.fecha_alta BETWEEN %s AND %s
-                GROUP BY c.genero''', (start_date, end_date))
-        if result:
-            data = []
-            for row in result:
-                data.append({
-                    'ventas': row[0],
-                    'genero': row[1]
-                })
-            return data
-        return None
+                GROUP BY c.genero'''
+        try:
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, (start_date, end_date))
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["ventas", "genero"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de productos más vendidos por género recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
     
     '''Ventas por categoria de zapato de una fecha a otra'''
     
     def get_categorySales(self , start_date=None ,end_date=None):
-        result = self._database.execute_query('''SELECT COUNT (a.id_detalle) AS ventas, c.nombre AS categoria
+        query = '''SELECT COUNT (a.id_detalle) AS ventas, c.nombre AS categoria
             FROM catalogos.detalle_venta a
             JOIN catalogos.producto b ON (a.id_producto = b.id_producto)
             JOIN catalogos.categoria c ON (b.id_categoria = c.id_categoria)
             WHERE a.fecha_alta BETWEEN %s AND %s
             GROUP BY c.nombre
-            ORDER BY ventas DESC''', (start_date, end_date))
-        if result:
-            data=[]
-            for row in result:
-                data.append({
-                    'ventas': row[0],
-                    'categoria': row[1]
-                })
-            return data
-        return None
+            ORDER BY ventas DESC'''
+    
+        try:
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, (start_date, end_date))
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["ventas", "categoria"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de ventas por categoría recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
     
     def get_productSales(self , start_date=None ,end_date=None , id_producto=None):
-        result = self._database.execute_query('''SELECT b.nombre, SUM (a.cantidad) AS cantidad, a.fecha_alta
+        query = '''SELECT b.nombre, SUM (a.cantidad) AS cantidad, a.fecha_alta
             FROM catalogos.detalle_venta a
             JOIN catalogos.producto b ON (a.id_producto = b.id_producto)
             WHERE (a.fecha_alta BETWEEN %s AND %s) AND a.id_producto = %s AND a.fecha_alta != '2025-07-03'
             GROUP BY b.nombre , a.fecha_alta
-            ORDER BY a.fecha_alta''', (start_date, end_date , id_producto) )
-        if result:
-            data=[]
-            for row in result:
-                data.append({
-                    'nombre': row[0],
-                    'ventas': row[1],
-                    'fecha_alta': format(row[2])
-                })
-            return data
-        return None
+            ORDER BY a.fecha_alta'''
+
+        try:
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, (start_date, end_date, id_producto))
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["nombre", "ventas", "fecha_alta"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de productos mas vendidos recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
+    
     def get_sucursalSales(self , start_date=None ,end_date=None ):
-        result = self._database.execute_query('''SELECT 
+        query = '''SELECT 
                 b.nombre, 
                 SUM(c.cantidad) AS cantidad, 
                 DATE_PART('month', a.fecha_venta) AS mes_numero --Solo tomo el mes
@@ -179,17 +226,32 @@ class SaleDetails():
             JOIN catalogos.detalle_venta c ON (a.id_venta = c.id_venta)
             WHERE a.fecha_venta BETWEEN %s AND %s
             GROUP BY b.nombre, DATE_PART('month', a.fecha_venta)
-            ORDER BY mes_numero''', (start_date, end_date ) )
-        if result:
-            data=[]
-            for row in result:
-                data.append({
-                    'sucursal': row[0],
-                    'ventas': row[1],
-                    'mes': int(row[2])
-                })
-            return data
-        return None
+            ORDER BY mes_numero'''
+        
+        try:
+            conn = self._database._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, (start_date, end_date))
+            results = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            columns = ["sucursal", "ventas", "mes"]
+            data = [dict(zip(columns, row)) for row in results]
+
+            logging.info(data)
+
+            return {
+                "success": True,
+                "message": "Datos para grafica de ventas en sucursales recuperados con exito",
+                "data": data
+            }, 200
+        
+        except Exception as e:
+            return {
+                "success": False,
+                "message": str(e),
+                "data": []
+            }, 500
     
     def get_Top_10_products(self, start_date, end_date):
         query = '''

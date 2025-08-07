@@ -36,15 +36,17 @@ export default function SalesBySucursal({ start_date, end_date }) {
                     return res.json();
                 })
                 .then(result => {
-                    if (result != null) {
-                        const mappedData = result.map(item => ({
+                    const res = result[0].success;
+                    if (res) {
+                        const data = result[0].data;
+                        const mappedData = data.map(item => ({
                             cantidad: item.ventas,
                             mes: item.mes,
                             nombre: item.sucursal
                         }));
                         setData(mappedData);
                     } else {
-                        console.error("Error en la respuesta del servidor:", result?.message);
+                        console.error("Error en la respuesta del servidor:", result[0].message);
                         setError("No se encontraron datos");
                     }
                 })
