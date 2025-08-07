@@ -1,11 +1,98 @@
 from flask import Blueprint, request, jsonify ,make_response
 from models.user import User
 from datetime import datetime, timedelta
-
+import logging
 
 user_bp = Blueprint('user', __name__)
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
+def validate_user(data):
+    required = [
+        "id_empleado",
+        "nombre_usu",
+        "id_departamento",
+        "correo",
+        "clave",
+        "estatus"
+    ]
+    errors = {}
+    for field in required:
+        if field not in data or data[field] in [None, '']:
+            errors[field] = f"{field} is required."
+    return errors
 
+@user_bp.route('/get', methods=['GET'])
+def get_all_users():
+    try:
+        model = User()
+        response, status = model.get_all()
+        return response, status
+    except Exception as e:
+        return jsonify({"message": str(e), 'success': False}), 500
+
+@user_bp.route('/get_by', methods=['GET'])
+def get_user_by():
+    try:
+        field = request.args.get('field')
+        value = request.args.get('value')
+
+        if not field or value is None:
+            return jsonify({"message": "Missing 'field' or 'value' parameter", 'success': False}), 400
+        
+        model = User()
+        result, status = model.load(field, value, get_data=True)
+
+        logger.debug(result)
+
+        return result, status
+    except Exception as e:
+        return jsonify({"message": str(e), 'success': False}), 500
+
+@user_bp.route('/create', methods=['POST'])
+def create_user():
+    try:
+        data = request.get_json()
+        errors = validate_user(data)
+        if errors:
+            return jsonify({"errors": errors}), 400
+        
+        model = User(data)
+        result, status = model.save()
+        return result, status
+    except Exception as e:
+        return jsonify({"message": str(e), 'success': False}), 500
+
+@user_bp.route('/update/<int:id_usu>', methods=['PUT'])
+def update_user(id_usu):
+    try:
+        data = request.get_json()
+        
+        model = User()
+        user = model.load("id_usu", id_usu)
+
+        if not user:
+            return jsonify({"message": "Usuario no encontrado", "success": False}), 404
+        
+        result, status = user.update(data)
+
+        return result, status    
+    except Exception as e:
+        return jsonify({"message": str(e), 'success': False}), 500
+
+@user_bp.route('/delete/<int:id_usu>', methods=['DELETE'])
+def delete_user(id_usu):
+    try:
+        model = User()
+        user = model.load("id_usu", id_usu)
+        if not user:
+            return jsonify({"message": "Usuario no encontrado", "success": False}), 404
+        
+        result, status = model.delete()
+        logging.debug(result)
+        return result, status
+    except Exception as e:
+        return jsonify({"message": str(e), 'success': False}), 500
 
 @user_bp.route('/post/login',methods=['POST'])
 def user_login():

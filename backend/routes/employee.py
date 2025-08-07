@@ -76,26 +76,27 @@ def update(id_empleado):
         data = request.get_json()
         
         model = Employee()
-        employee = model.load(id_empleado)
+        employee = model.load("id_empleado", id_empleado)
 
         if not employee:
             return jsonify({"message": "Empleado no encontrado"}), 404
         
         result, status = employee.update(data)
-
+        logging.debug(result)
         return result, status    
     except Exception as e:
         return jsonify({"message": str(e), 'success': False}), 500
 
 @employee_bp.route('/delete/<int:id_empleado>', methods=['DELETE'])
-def delete(id_employee):
+def delete(id_empleado):
     try:
         model   = Employee()
-        employee = model.load(id_employee) 
+        employee = model.load("id_empleado", id_empleado) 
         if not employee:
             return jsonify({"message": "Producto no encontrado", "success": False}), 404
         
         result, status = model.delete()
+        logging.debug(result)
         return result, status
     except Exception as e:
         return jsonify({"message": str(e), 'success': False}), 500

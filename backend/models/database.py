@@ -45,7 +45,7 @@ class DataBase():
 
             response, status = self._prepare_response(True, "success", data, 200)
             return response, status
-        except Exception as e: 
+        except Exception as e:
             return self._prepare_response(False, "error", {"error": str(e)}, 400)
 
     def get_by(self, field, value, table): 

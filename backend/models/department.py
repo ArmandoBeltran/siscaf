@@ -1,5 +1,7 @@
 from .database import DataBase
 
+import logging
+
 class Department():
 
     def __init__(self, data=None):
@@ -33,6 +35,11 @@ class Department():
         return self._database.insert(self._table, self.to_dict())
         
     def update(self, new_data): 
+        if 'id_departamento' in new_data:
+            logging.debug("#"*100)
+            new_data = dict(new_data)
+            new_data.pop('id_departamento')
+        logging.debug(new_data)
         return self._database.update(self._table, new_data, {"id_departamento": self.id_departamento})
 
     def delete(self):
