@@ -4,7 +4,7 @@ import json
 
 from datetime import datetime, timedelta
 
-
+import logging
 
 class User(): 
 
@@ -18,6 +18,7 @@ class User():
         self.clave = None
         self.id_departamento = None
         self.id_empleado = None
+        self.estatus = None
         self.fecha_alta = None
         self.fecha_mod = None
 
@@ -29,48 +30,71 @@ class User():
             if hasattr(self, key):
                 setattr(self, key, value)
 
-    def to_dict(self):
-        return {
+    def to_dict(self, include_all=None):
+        data = {
             "id_usu": self.id_usu,
             "nombre_usu": self.nombre_usu,
             "correo": self.correo,
             "clave": self.clave,
             "id_departamento": self.id_departamento,
             "id_empleado": self.id_empleado,
+            "estatus" : self.estatus,
             "fecha_alta": self.fecha_alta,
             "fecha_mod": self.fecha_mod,
         }
+    
+        return data if include_all else {key: value for key, value in data.items() if value is not None}
 
     def save(self):
-        if self.id_empleado if hasattr(self, 'id_empleado') else None:
-            return self._database.update(self._table, self.to_dict(), {"id_empleado": self.id_empleado})
-        else:
-            return self._database.insert(self._table, self.to_dict())
+        return self._database.insert(self._table, self.to_dict())
+        
+    def update(self, new_data): 
+        if "id_usu" in new_data: 
+            new_data = dict(new_data)
+            new_data.pop("id_usu")
+        return self._database.update(self._table, new_data, {"id_usu": self.id_usu})
 
     def delete(self):
-        if hasattr(self, 'id_empleado') and self.id_empleado:
-            return self._database.delete(self._table, {"id_empleado": self.id_empleado})
-        return "Cannot delete: id_empleado is not set."
-
-    def load(self, record_id):
-        result = self._database.get_by(self._table, list(self.to_dict().keys())[0], record_id)
-        if result:
-            columns = list(self.to_dict().keys())
-            self._from_dict(dict(zip(columns, result[0])))
-            return self
-        return None
+        return self._database.delete(self._table, {"id_usu": self.id_usu})
     
+    def load(self, parameter, value, get_data=False):
+        response, status = self._database.get_by(parameter, value, self._table)
+        results = response.get("data")
+
+        if results:
+            if isinstance(results, list):
+                self._from_dict(results[0])
+                if get_data:
+                    response["data"] = [self._clone_with_data(row).to_dict() for row in results]
+                    return response, status
+            else:
+                self._from_dict(results)
+                if get_data:
+                    response["data"] = [self.to_dict()]
+                    return response, status
+
+            return self
+        else:
+            response["data"] = []
+            return response, status
+    
+    def _clone_with_data(self, data):
+        instance = self.__class__()
+        instance._from_dict(data)
+        return instance
+
     def get_all(self):
-        results = self._database.get_all(self._table)
+        response, status = self._database.get_all(self._table)
+        results  = response.get('data')
         data = []
         if results:
-            columns = list(self.to_dict().keys())
             for row in results:
                 instance = self.__class__()
-                instance._from_dict(dict(zip(columns, row)))
+                instance._from_dict(row)
                 data.append(instance.to_dict())
         
-        return data
+        response["data"] = data
+        return response, status
     
     def create_session(self, user_id, extra_data=None):
         session_id = str(uuid.uuid4())
@@ -98,16 +122,17 @@ class User():
             WHERE correo = %s AND clave = %s AND estatus = 'true' ''',
             (email, clave)
         )
+
         if result:
-            columns = ["id_usu", "id_empleado", "nombre_usu", "id_departamento", "correo"]
-            data = [dict(zip(columns, row)) for row in result]
+            user_data = result[0]
+            logging.debug(f"Login user_data: {user_data}")
             
-            user_data = data[0]
-            session_id = self.create_session(user_data['id_usu'] , user_data)
-        
-            
-            return user_data , session_id
-        
+            # Validación para asegurar que sea int
+            user_id = int(user_data['id_usu'])
+
+            session_id = self.create_session(user_id, user_data)
+            return user_data, session_id
+
         return None
     
     def delete_Session(self, session_id):
@@ -122,11 +147,15 @@ class User():
         ''', (session_id,))
         
         if result:
-            columns = ["session_id", "user_id", "expires_at"]
-            return dict(zip(columns, result[0]))
+            return result[0]  # ← ya es un dict real
         return None
 
     def get_user_by_id(self, user_id):
+        try:
+            user_id = int(user_id)
+        except ValueError:
+            return None
+
         result = self._database.execute_query('''
             SELECT id_usu, id_empleado, nombre_usu, id_departamento, correo
             FROM empleados.usuarios
@@ -134,6 +163,5 @@ class User():
         ''', (user_id,))
         
         if result:
-            columns = ["id_usu", "id_empleado", "nombre_usu", "id_departamento", "correo"]
-            return dict(zip(columns, result[0]))
+            return result[0]  # Ya es dict por RealDictCursor
         return None

@@ -1,0 +1,88 @@
+.card-horizontal {
+    display: flex;
+    flex-direction: row;
+    background-color: #343131;
+    color: #aa871d;
+    border: 1px solid #aa871d77;
+    border-radius: 10px;
+    padding: 10px;
+    height: 140px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s, transform 0.2s;
+    box-sizing: border-box;
+}
+
+.card-horizontal:hover {
+    background-color: #4a4747;
+    transform: scale(1.01);
+}
+
+.card-icon {
+    background-color: #aa871d;
+    width: 60px;
+    height: 100%;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.icon-shoe {
+    color: #343131;
+    font-size: 20px;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    margin-left: 10px;
+    overflow: hidden;
+}
+
+.info {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.info h3 {
+    margin: 0 0 3px 0;
+    font-size: 1rem;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.info p {
+    margin: 1px 0;
+    font-size: 0.75rem;
+    color: #e0c26e;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    margin-top: 6px;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #aa871d;
+    transition: color 0.2s;
+}
+
+.btn-icon:hover {
+    color: #d6b24a;
+}

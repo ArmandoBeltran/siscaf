@@ -7,7 +7,19 @@ const modules = [
         submenus: [
             { url: "/ReporteDepartamentosEmpleados", text: "Reporte de Empleados por Departamento",}
         ]
-    }
+    }, 
+    {
+        text: "Departmentos", 
+        url: "/Departamentos"
+    },
+    {
+        text: "Empleados", 
+        url: "/Empleados"
+    },
+    {
+        text: "Usuarios", 
+        url: "/Usuarios"
+    },
 ];
 
 function AdminLayout({ toolbarTitle, toolbarActions, children }) {

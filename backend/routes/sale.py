@@ -9,7 +9,8 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def validate_sale(data):
-    required = []
+    
+    required = ["id_vendedor" , "id_sucursal" ]
     errors = {}
     for field in required:
         if field not in data or data[field] in [None, '']:
@@ -54,14 +55,20 @@ def get_sales():#Reporte de ventas General
 @sale_bp.route('/create', methods=['POST'])
 def create():
     try:
+        password=2059
         data = request.get_json()
-        errors = validate_sale(data)
-        if errors:
-            return jsonify({"errors": errors, "success": False}), 400
-        model = Sale(data)
-        result, status = model.save()
+        pwd = int(data['pwd'])
         
-        return result, status
+        if pwd == password:
+            errors = validate_sale(data)
+            if errors:
+                return jsonify({"errors": errors, "success": False}), 400
+            model = Sale(data)
+            result = model.save( data['id_vendedor'] , data['id_sucursal'])
+            
+            return jsonify({"id_venta": result, "success": True}), 200
+        else:
+            return jsonify({"error": "Clave incorrecta" ,"success" : False })
     except Exception as e:
         return jsonify({"message": str(e), "success": False}), 500
 
@@ -85,7 +92,7 @@ def update(id_venta):
 def delete(id_venta):
     try:
         model = Sale()
-        instance = model.load(id_venta)
+        instance = model.load("id_venta",id_venta)
         if not instance:
             return jsonify({"message": "Venta no encontrada", "success": False}), 404
         

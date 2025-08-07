@@ -26,13 +26,13 @@ function Home() {
         </div>
         <div className="home-buttons">
           <HomeButton 
-            route="/Inventario"
+            route="/Inventarios"
             img={InventoryImg}
             alt="Módulo de Inventarios"
             text="Inventarios"
             description="Gestión de productos, materiales y existencias."/>
           <HomeButton 
-            route="#"
+            route="/ReporteDepartamentosEmpleados"
             img={AdministrationImg}
             alt="Módulo de Administración"
             text="Administración"
