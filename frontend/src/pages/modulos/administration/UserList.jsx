@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "bootstrap";
-import ModalForm from "../../../components/modal";
+import ModalTemplate from "../../../components/ModalTemplate";
 import UserForm from "../../../components/UserForm";
 import UserCard from "../../../components/UserCard";
 import "../../../assets/css/product-list.css";
@@ -211,7 +211,7 @@ function UserList() {
         )}
       </div>
 
-      <ModalForm
+      <ModalTemplate
         id="modalCreateUser"
         titulo={isEditMode ? "Editar Usuario" : "Crear Usuario"}
         form={

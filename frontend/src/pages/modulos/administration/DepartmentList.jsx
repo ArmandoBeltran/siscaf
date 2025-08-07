@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal } from "bootstrap";
-import ModalForm from "../../../components/modal";
+import ModalTemplate from "../../../components/ModalTemplate";
+import ModalTemplate from "../../../components/ModalTemplate";
 import DepartmentForm from "../../../components/DepartmentForm";
 import DepartmentCard from "../../../components/DepartmentCard";
 import '../../../assets/css/product-list.css';
@@ -165,7 +166,7 @@ function DepartmentList() {
         )}
       </div>
 
-      <ModalForm
+      <ModalTemplate
         id="modalCreateDepartment"
         titulo={isEditMode ? "Editar Departamento" : "Crear Departamento"}
         form={

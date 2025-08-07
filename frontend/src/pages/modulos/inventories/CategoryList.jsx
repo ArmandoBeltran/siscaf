@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Modal } from "bootstrap";
 import CategoryCard from "../../../components/CategoryCard";
 import InventoryLayout from "./InventoryLayout";
-import ModalForm from "../../../components/modal";
 import CategoryForm from "../../../components/CategoryForm"; // asegúrate de tenerlo
 import '../../../assets/css/product-list.css';
+import ModalTemplate from "../../../components/ModalTemplate";
 
 function CategoryList() {
   const [categories, setCategories] = useState([]);
@@ -172,7 +172,7 @@ function CategoryList() {
         )}
       </div>
 
-      <ModalForm
+      <ModalTemplate
         id="modalCreateCategory"
         titulo={isEditMode ? "Editar Categoría" : "Crear Nueva Categoría"}
         form={

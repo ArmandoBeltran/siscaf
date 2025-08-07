@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Modal } from "bootstrap";
 import ProductCard from "../../../components/ProductCard";
 import InventoryLayout from "./InventoryLayout";
-import ModalForm from "../../../components/modal";
+import ModalTemplate from "../../../components/ModalTemplate";
 import ProductForm from "../../../components/ProductForm";
 import "../../../assets/css/product-list.css";
 
@@ -201,7 +201,7 @@ function ProductList() {
         )}
       </div>
 
-      <ModalForm
+      <ModalTemplate
         id="modalCreateProduct"
         titulo={isEditMode ? "Editar Producto" : "Crear Nuevo Producto"}
         form={
