@@ -16,6 +16,10 @@ import Pagina404 from './pages/page404';
 import ProductList from './pages/modulos/inventories/ProductList';
 import CategoryList from './pages/modulos/inventories/CategoryList';
 import CategoriesReport from './pages/modulos/inventories/CategoriesReport';
+import DepartmentList from './pages/modulos/administration/DepartmentList';
+import DepartmentsReport from './pages/modulos/administration/reports/DepartmentsReport';
+import EmployeeList from './pages/modulos/administration/EmployeeList';
+import UserList from './pages/modulos/administration/UserList';
 
 //Archivo Raiz, colocar las paginas aqui con su ruta
 function App() {
@@ -35,6 +39,10 @@ function App() {
             <Route path="/ventas" element={<SalesLayout />} />
             <Route path="/ventasPorGenero" element={<SalesByGender />} />
             <Route path="/GraficasVentas" element={<SalesGrahps />} />
+            <Route path="/Departamentos" element={<DepartmentList />} />
+            <Route path="/Empleados" element={<EmployeeList/>}/>
+            <Route path="/Usuarios" element={<UserList/>}/>
+            <Route path="/ReporteDepartamentosEmpleados" element={<DepartmentsReport />} />
           </Route>
         <Route path="/404"element={<Pagina404/>} ></Route>
         </Routes>

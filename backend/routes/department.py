@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def validate_department(data):
-    required = ["nombre", "id_empleado", "estatus"]
+    required = ["nombre"]
     errors = {}
     for field in required:
         if field not in data or data[field] in [None, '']:
@@ -63,14 +63,17 @@ def update(id_department):
         data = request.get_json()
 
         model = Department()
-        instance = model.load(id_department)
+        instance = model.load("id_departamento", id_department)
 
         if not instance:
             return jsonify({"message": "Categoría no encontrada", "success": False}), 404
         
         result, status = instance.update(data)
+        logging.debug(result)
         return result, status
     except Exception as e:
+        logging.error(str(e))
+        logging.error("$"*100)
         return jsonify({"error": str(e)}), 500
 
 
@@ -78,7 +81,7 @@ def update(id_department):
 def delete(id_department):
     try:
         model = Department()
-        instance = model.load(id_department)
+        instance = model.load("id_departamento", id_department)
         if not instance:
             return jsonify({"message": "Departamento no encontrado", "success": False}), 404
         
