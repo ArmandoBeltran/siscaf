@@ -7,7 +7,7 @@ from datetime import datetime
 
 #import requests
 
-ODOO_API = "https://ea0c7dc76b51.ngrok-free.app/external_api/products"
+ODOO_API = "https://5202d12fa65e.ngrok-free.app/external_api/products"
 
 class Product(): 
 

@@ -289,7 +289,7 @@ function SalesGraphs() {
               </div>
 
               <div class="tab-pane fade" id="productividad" role="tabpanel" aria-labelledby="T10P-tab">
-                <h1>Top 10 Productos más vendidos</h1>
+                <h1>Reporte de Productividad</h1>
                 <label htmlFor="performanceYear">Fecha Inicio:</label>
                 <input
                   type="number"
