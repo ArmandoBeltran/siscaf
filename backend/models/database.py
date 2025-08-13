@@ -9,16 +9,16 @@ class DataBase():
     def __init__(self):
         self._db_host     = os.getenv("DB_HOST", "localhost")
         self._db_name     = os.getenv("DB_NAME", "andres_db")
-        self._db_user     = os.getenv("DB_USER", "postgresql")
-        self._db_password = os.getenv("DB_PASSWORD", "admin")
+        self._db_user     = os.getenv("DB_USER", "postgres")
+        self._db_password = os.getenv("DB_PASSWORD", "usuario")
 
     def _get_connection(self): 
         conn = psycopg2.connect(
-            host="localhost",
-            database="andres_db",
-            user="postgres",
-            password="admin",
-            port=5432
+            host = "localhost",
+            database = "andres_db",
+            user = "postgres",
+            password = "usuario",
+            port = 5432
         )
         return conn
     
@@ -45,8 +45,8 @@ class DataBase():
 
             response, status = self._prepare_response(True, "success", data, 200)
             return response, status
-        except Exception as e:
-            return self._prepare_response(False, "error", {"error": str(e)}, 400)
+        except Exception as e: 
+            return self._prepare_response(False, "error", str(e), 400)
 
     def get_by(self, field, value, table): 
         try: 
