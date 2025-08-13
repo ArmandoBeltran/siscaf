@@ -5,7 +5,7 @@ logger = logging.getLogger(__name__)
 
 from datetime import datetime
 
-import requests
+#import requests
 
 ODOO_API = "https://ea0c7dc76b51.ngrok-free.app/external_api/products"
 

@@ -20,7 +20,7 @@ import DepartmentList from './pages/modulos/administration/DepartmentList';
 import DepartmentsReport from './pages/modulos/administration/reports/DepartmentsReport';
 import EmployeeList from './pages/modulos/administration/EmployeeList';
 import UserList from './pages/modulos/administration/UserList';
-
+import Sales from './pages/modulos/sales/Sales';
 //Archivo Raiz, colocar las paginas aqui con su ruta
 function App() {
   return (
@@ -36,7 +36,7 @@ function App() {
             <Route path="/ReporteCategorias" element={<CategoriesReport />} />
             <Route path="/Productos" element={<ProductList />}/>
             <Route path="/Categorias" element={<CategoryList />}/>
-            <Route path="/ventas" element={<SalesLayout />} />
+            <Route path="/ventas" element={<Sales />} />
             <Route path="/ventasPorGenero" element={<SalesByGender />} />
             <Route path="/GraficasVentas" element={<SalesGrahps />} />
             <Route path="/Departamentos" element={<DepartmentList />} />
